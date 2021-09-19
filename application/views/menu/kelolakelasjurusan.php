@@ -2,28 +2,28 @@
     <!-- row -->
 
 
+    <?php if ($this->session->flashdata('flash')) : ?>
+        <div class="alert alert-<?= $this->session->flashdata('flash')['alert'] ?> alert-dismissible alert-alt fade show my-4 mx-5">
+            <button type="button" class="close h-100" data-dismiss="alert" aria-label="Close"><span><i class="mdi mdi-close"></i></span>
+            </button>
+            <strong><?= $this->session->flashdata('flash')['alert'] ?>!</strong> <?= $this->session->flashdata('flash')['message']; ?>.
+        </div>
+    <?php endif; ?>
 
-    <div class="col-xl-12">
+    <div class="col-xl-12 mt-5">
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Vertical Nav Pill</h4>
             </div>
 
 
-            <?php if ($this->session->flashdata('flash')) : ?>
-                <div class="alert alert-success alert-dismissible alert-alt fade show">
-                    <button type="button" class="close h-100" data-dismiss="alert" aria-label="Close"><span><i class="mdi mdi-close"></i></span>
-                    </button>
-                    <strong>Success!</strong> <?= $this->session->flashdata('success'); ?>.
-                </div>
-            <?php endif; ?>
 
             <div class="card-body">
                 <div class="row">
                     <div class="col-xl-2">
                         <div class="nav flex-column nav-pills mb-3">
                             <a href="#v-pills-kelas" data-toggle="pill" class="nav-link active show">Kelas</a>
-                            <a href="#v-pills-profile" data-toggle="pill" class="nav-link">Jurusan</a>
+                            <a href="#v-pills-jurusan" data-toggle="pill" class="nav-link">Jurusan</a>
 
                         </div>
                     </div>
@@ -31,8 +31,8 @@
                         <div class="tab-content">
                             <div id="v-pills-kelas" class="tab-pane fade active show">
                                 <div class="col-12">
-                                    <div class="card">
-                                        <a class="btn btn-success col-2 offset-8 tambahkelas">tambah</a>
+                                    <div class="card shadow">
+                                        <a class="btn btn-success col-md-2 offset-md-8 col-5 tambahkelas mt-4   shadow">tambah</a>
                                         <div class="card-body">
                                             <div class="table-responsive">
                                                 <table id="example3" class="display min-w750">
@@ -41,7 +41,7 @@
 
                                                             <th>Nama Kelas</th>
                                                             <th>Kelas</th>
-                                                            <th>Action</th>
+                                                            <th>Aksi</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -55,7 +55,8 @@
                                                                 <td>
                                                                     <div class="d-flex">
                                                                         <a class="editkelas btn btn-primary shadow btn-xs sharp mr-1" idkelas="<?= $k['id_kelas']; ?>"><i class="fa fa-pencil"></i></a>
-                                                                        <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+
+                                                                        <a href="<?= base_url(); ?>menu/hapuskelas/<?= base64_encode($k['id_kelas']) ?>" onclick="return confirm('Anda yakin ingin menghapus kelas <?= $k['kelas'] ?>')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -69,11 +70,45 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="v-pills-profile" class="tab-pane fade">
-                                <p>Culpa dolor voluptate do laboris laboris irure reprehenderit id incididunt duis pariatur mollit aute magna pariatur consectetur. Eu veniam duis non ut dolor deserunt commodo et minim in quis laboris ipsum
-                                    velit id veniam. Quis ut consectetur adipisicing officia excepteur non sit. Ut et elit aliquip labore Lorem enim eu. Ullamco mollit occaecat dolore ipsum id officia mollit qui esse anim eiusmod do sint
-                                    minim consectetur qui.
-                                </p>
+                            <div id="v-pills-jurusan" class="tab-pane fade">
+                                <div class="col-12">
+                                    <div class="card shadow">
+                                        <a class="btn btn-success col-md-2 offset-md-8 col-5 tambahjurusan mt-4   shadow">tambah</a>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table id="example3" class="display min-w750">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>ID jurusan</th>
+                                                            <th>Jurusan</th>
+                                                            <th>Aksi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        foreach ($jurusan as $j) :
+                                                        ?>
+                                                            <tr>
+
+                                                                <td><?= $j['id_jurusan'] ?></td>
+                                                                <td><?= $j['jurusan'] ?></td>
+                                                                <td>
+                                                                    <div class="d-flex">
+                                                                        <a class="editjurusan btn btn-primary shadow btn-xs sharp mr-1" idjurusan="<?= $j['id_jurusan']; ?>"><i class="fa fa-pencil"></i></a>
+
+                                                                        <a href="<?= base_url(); ?>menu/hapusjurusan/<?= base64_encode($j['id_jurusan']) ?>" onclick="return confirm('Anda yakin ingin menghapus jurusan <?= $j['jurusan'] ?>')" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                        <?php endforeach; ?>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
@@ -103,13 +138,13 @@ $csrf = array(
                 <form class="formkelas" method="POST">
                     <div class="form-row">
                         <input type="hidden" name="<?= $csrf['name']; ?>" value="<?= $csrf['hash']; ?>" />
-                        <input type="hidden" name="idkelas" class="id_kelas" id="">
+                        <input type="hidden" name="idkelas" class="id_kelas" id="id_kelas">
                         <div class="form-group col-md-12">
-                            <label>Nama Kelas</label>
+                            <label class="labelnama">Nama Kelas</label>
                             <input type="text" name="nama_kelas" id="namakelas" placeholder="nama kelas" class="form-control" autofocus required>
                         </div>
-                        <div class="form-group col-md-12">
-                            <label>Kelas</label>
+                        <div class="form-group col-md-12 form2">
+                            <label class="labelkelas">Kelas</label>
                             <input type="text" name="kelas" class="form-control kelas" placeholder="kelas">
                         </div>
                     </div>
@@ -132,9 +167,10 @@ $csrf = array(
     // edit kelas
     $('.editkelas').click(function() {
         const idkelas = $(this).attr("idkelas");
+        $('#id_kelas').attr('value', idkelas)
         $('.modal-title').html('Edit Kelas')
         $('.buttonsubmit').html('Perbarui')
-        $('.formkelas').attr('action', '<?= base_url(); ?>menu/perbaruikelas')
+        $('.formkelas').attr('action', '<?= base_url(); ?>menu/editkelas')
 
         $.ajax({
             type: 'POST',
@@ -154,5 +190,50 @@ $csrf = array(
                 $('.modal-body').html('Kesalahan system')
             }
         });
+    })
+
+
+    // jurusan
+    //tambah kelas
+    $('.tambahjurusan').click(function() {
+        $('.modal-title').html('Tambah Jurusan')
+        $('.labelnama').html('Nama Jurusan');
+        $('.form2').html('');
+        $('#namakelas').attr('placeholder', 'Nama Jurusan');
+        $('#namakelas').attr('name', 'namajurusan');
+
+        $('.buttonsubmit').html('Tambah')
+        $('.formkelas').attr('action', '<?= base_url(); ?>menu/tambahjurusan')
+        $('#modalkelas').modal();
+    })
+    $('.editjurusan').click(function() {
+        const idjurusan = $(this).attr("idjurusan");
+        $('.labelnama').html('Nama Jurusan');
+        $('.form2').html('');
+        $('#id_kelas').attr('value', idjurusan)
+        $('#id_kelas').attr('name', 'idjurusan')
+        $('.modal-title').html('Edit Jurusan')
+        $('.buttonsubmit').html('Perbarui')
+        $('#namakelas').attr('name', 'namajurusan');
+        $('.formkelas').attr('action', '<?= base_url(); ?>menu/editjurusan')
+
+        $.ajax({
+            type: 'POST',
+            url: "<?= base_url(); ?>menu/ambiljurusan",
+            data: {
+                idjurusan: idjurusan,
+            },
+            dataType: 'json',
+            success: function(data) {
+                // console.log(data)
+                $('.id_kelas').val(data[0].id_jurusan);
+                $('#namakelas').val(data[0].jurusan);
+
+            },
+            error: function() {
+                $('.modal-body').html('Kesalahan system')
+            }
+        });
+        $('#modalkelas').modal();
     })
 </script>

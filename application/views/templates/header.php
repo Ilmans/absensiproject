@@ -13,7 +13,8 @@
     <link href="<?= base_url(); ?>assets/vendor/owl-carousel/owl.carousel.css" rel="stylesheet">
     <link type="text/css" href="<?= base_url(); ?>assets/css/style.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-
+    <!-- Datatable -->
+    <link href="<?= base_url(); ?>assets/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
 </head>
 
@@ -189,6 +190,12 @@
                         </a>
                         <ul aria-expanded="false">
                             <li><a href="<?= base_url(); ?>menu/kelasdanjurusan"> Kelas & Jurusan</a></li>
+                        </ul>
+                        <ul aria-expanded="false">
+                            <li><a href="<?= base_url(); ?>siswa"> Siswa</a></li>
+                        </ul>
+                        <ul aria-expanded="false">
+                            <li><a href="<?= base_url(); ?>user"> User</a></li>
                         </ul>
                     </li>
 

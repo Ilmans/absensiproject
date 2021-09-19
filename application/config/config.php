@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-
+date_default_timezone_set("Asia/Jakarta");
 /*
 |--------------------------------------------------------------------------
 | Base Site URL
@@ -24,7 +24,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 |
 */
 
-$config['base_url'] = 'http://localhost/ci3app/';
+$config['base_url'] = 'http://localhost/ci3app/absensiproject';
 
 /*
 |--------------------------------------------------------------------------
@@ -159,7 +159,7 @@ $config['composer_autoload'] = FALSE;
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
+$config['permitted_uri_chars'] = '';
 
 /*
 |--------------------------------------------------------------------------
@@ -454,7 +454,7 @@ $config['csrf_token_name'] = 'csrf_test_name';
 $config['csrf_cookie_name'] = 'csrf_cookie_name';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
-$config['csrf_exclude_uris'] = array('menu/ambilkelas');
+$config['csrf_exclude_uris'] = array('menu/ambilkelas', 'menu/ambiljurusan');
 
 /*
 |--------------------------------------------------------------------------
