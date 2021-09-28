@@ -9,6 +9,8 @@ class Menu extends CI_Controller
         parent::__construct();
         $this->load->model('M_kelas');
         $this->load->model('M_jurusan');
+        $this->load->model('M_user');
+        $this->load->model('M_menu');
         $this->load->library('form_validation');
     }
 
@@ -17,128 +19,181 @@ class Menu extends CI_Controller
 
         $data = [
             'title' => WEBNAME . 'Menu access',
-            'webname' => WEBNAME
+            'webname' => WEBNAME,
+
         ];
         $this->load->view('templates/header', $data);
         $this->load->view('templates/footer');
     }
 
-    public function kelasdanjurusan()
-    {
-        $data = [
-            'title' => WEBNAME . 'Kelola Kelas & Jurusan',
-            'webname' => WEBNAME,
-            'kelas' => $this->M_kelas->tampilkelas(),
-            'jurusan' => $this->M_jurusan->tampiljurusan()
-        ];
-        $this->load->view('templates/header', $data);
-        $this->load->view('menu/kelolakelasjurusan');
-        $this->load->view('templates/footer');
-    }
 
 
     // kelola kelas
     // digunakan untuk ajax
-    public function ambilkelas()
+
+
+
+
+    // access
+    public function Access()
     {
-        $idkelas = $this->input->post('idkelas');
-        echo json_encode($this->M_kelas->ambilkelas($idkelas));
+        $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
+        $url = $this->uri->segment(1) . '/' . $this->uri->segment(2);
+
+        verifikasiuser($datauser['role_id'], $url);
+        if ($datauser['role_id'] != 1) {
+            echo 'Anda tidak diizinkan untuk akses halaman ini';
+            exit;
+        };
+        $data = [
+            'title' => 'Access Management',
+            'user' => $datauser,
+            'webname' => WEBNAME
+        ];
+        //$data['Tabel_absensi'] = $this->Msiswa->tampil_data_login_Absen();
+        $this->load->view('templates/header', $data);
+        $this->load->view('menu/access');
+        $this->load->view('templates/footer');
     }
 
-    public function tambahkelas()
+
+    // menu
+    public function management()
     {
-        $this->form_validation->set_rules(
-            'nama_kelas',
-            'Nama_kelas',
-            'required|is_unique[tabel_kelas.nama_kelas]',
-            [
-                'is_unique' => 'nama kelas ' . $this->input->post('nama_kelas') . ' sudah ada di database'
-            ]
-        );
-        $this->form_validation->set_rules('kelas', 'Kelas', 'required|is_unique[tabel_kelas.kelas]', [
-            'is_unique' => 'Kelas ' . $this->input->post('kelas') . ' sudah ada di database'
+        $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
+        $url = $this->uri->segment(1) . '/' . $this->uri->segment(2);
+        verifikasiuser($datauser['role_id'], $url);
+        $data = [
+            'title' => WEBNAME . '| Menu Management',
+            'user' => $datauser,
+            'webname' => WEBNAME,
+            'titleedit' => 'Edit Menu',
+            'titletambah' => 'Tambah Menu'
+        ];
+        //$data['Tabel_absensi'] = $this->Msiswa->tampil_data_login_Absen();
+        $data['Menu'] = $this->M_menu->Tampil_menu();
+        $this->load->view('templates/header', $data);
+        $this->load->view('menu/management');
+        $this->load->view('templates/footer');
+    }
+    public function Tambah()
+    {
+        //$data['user'] untuk menampilkan nama yang login  di header dan saidbar
+
+        $this->form_validation->set_rules('menu', 'menu', 'required|trim', [
+            'required' => 'Menu Tidak Boleh kosong'
         ]);
-
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => validation_errors()]);
-        } else {
-            $this->M_kelas->inputkelas();
-            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Data berhasil di input']);
-        }
-        redirect(base_url() . 'menu/kelasdanjurusan');
-    }
-
-    public function hapuskelas()
-    {
-        $this->M_kelas->hapuskelas(base64_decode($this->uri->segment(3)));
-        $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Kelas berhasil di hapus']);
-        redirect(base_url() . 'menu/kelasdanjurusan');
-    }
-
-    public function editkelas()
-    {
-        $this->form_validation->set_rules(
-            'nama_kelas',
-            'Nama_kelas',
-            'required'
-        );
-        $this->form_validation->set_rules('kelas', 'Kelas', 'required');
-
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => validation_errors()]);
-        } else {
-            $this->M_kelas->editkelas();
-            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Data berhasil di edit']);
-        }
-        redirect(base_url() . 'menu/kelasdanjurusan');
-    }
-
-    // kelola jurusan 
-    public function tambahjurusan()
-    {
-        $this->form_validation->set_rules('namajurusan', 'Namajurusan', 'required|min_length[3]|is_unique[tabel_jurusan.jurusan]', [
-            'min_length' => 'Nama jurusan minimal 3 karakter',
-            'is_unique' => 'Jurusan ' . $this->input->post('namajurusan') . ' sudah terdaftar'
+        $this->form_validation->set_rules('icon', 'icon', 'required|trim', [
+            'required' => 'Icon Tidak Boleh kosong'
         ]);
-        if ($this->form_validation->run() == FALSE) {
+        if ($this->form_validation->run() == false) {
             $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => validation_errors()]);
         } else {
-            $this->M_jurusan->tambahjurusan();
-            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Jurusan' . $this->input->post('namajurusan') . ' berhasil di tambahkan']);
+            $this->M_menu->tambahmenu();
+            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'berhasil di tambah']);
         }
-        redirect(base_url() . 'menu/kelasdanjurusan');
+        redirect(base_url('menu/management'));
     }
-
-    public function hapusjurusan()
+    public function Edit()
     {
-        $this->M_jurusan->hapusjurusan(base64_decode($this->uri->segment(3)));
-        $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Jurusan berhasil di hapus']);
-        redirect(base_url() . 'menu/kelasdanjurusan');
-    }
-
-    public function ambiljurusan()
-    {
-        $idjurusan = $this->input->post('idjurusan');
-        echo json_encode($this->M_jurusan->ambiljurusan($idjurusan));
-    }
-
-    public function editjurusan()
-    {
-        $this->form_validation->set_rules(
-            'namajurusan',
-            'namajurusan',
-            'required|min_length[3]',
-            [
-                'min_length' => 'Nama jurusan minimal 3 karakter'
-            ]
-        );
-        // $this->form_validation->set_rules('kelas', 'Kelas', 'required');
-        if ($this->form_validation->run() == FALSE) {
+        $this->form_validation->set_rules('menu', 'menu', 'required|trim', [
+            'required' => 'Menu Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('icon', 'icon', 'required|trim', [
+            'required' => 'Icon Tidak Boleh kosong'
+        ]);
+        if ($this->form_validation->run() == false) {
             $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => validation_errors()]);
         } else {
-            $this->M_jurusan->editjurusan();
-            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Data berhasil di edit']);
+            $this->M_menu->edit();
+            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Berhasil edit menu']);
         }
-        redirect(base_url() . 'menu/kelasdanjurusan');
+        redirect(base_url('menu/management'));
+    }
+    public function Hapus($id)
+    {
+        //message adalah parameter untuk membuat pesan
+        $id = base64_decode($id);
+        $this->M_menu->hapusmenu($id);
+        $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => 'Berhasil Hapus']);
+        redirect(base_url('menu/management'));
+    }
+    //
+
+    // submenu
+    public function submanagement()
+    {
+
+        $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
+        $url = $this->uri->segment(1) . '/' . $this->uri->segment(2);
+
+        verifikasiuser($datauser['role_id'], $url);
+        $data = [
+            'title' => WEBNAME . '| Menu Management',
+            'user' => $datauser,
+            'webname' => WEBNAME,
+            'titleedit' => 'Edit Sub Menu',
+            'titletambah' => 'Tambah Sub Menu',
+            'Menu' => $this->M_menu->Tampil_menu(),
+            'Submenu' => $this->M_menu->DataJoinTampil_sub_menu()
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('menu/submanagement', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function tambahsub()
+    {
+        //$data['user'] untuk menampilkan nama yang login  di header dan saidbar
+
+        $this->form_validation->set_rules('menu_id', 'menu', 'required|trim', [
+            'required' => 'Menu Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('title', 'title', 'required|trim', [
+            'required' => 'title Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('url', 'url', 'required|trim', [
+            'required' => 'url Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('is_active', 'is_active', 'required|trim', [
+            'required' => 'is_active Tidak Boleh kosong'
+        ]);
+        if ($this->form_validation->run() == false) {
+            $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => validation_errors()]);
+        } else {
+            $this->M_menu->tambahsub();
+            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Berhasil tambah sub menu']);
+        }
+        redirect(base_url('menu/submanagement'));
+    }
+    public function editsub()
+    {
+        $this->form_validation->set_rules('menu_id', 'menu', 'required|trim', [
+            'required' => 'Menu Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('title', 'title', 'required|trim', [
+            'required' => 'title Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('url', 'url', 'required|trim', [
+            'required' => 'url Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('is_active', 'is_active', 'required|trim', [
+            'required' => 'is_active Tidak Boleh kosong'
+        ]);
+        if ($this->form_validation->run() == false) {
+            $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => validation_errors()]);
+        } else {
+            $this->M_menu->editsubmenu();
+            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Berhasil edit sub menu']);
+            redirect(base_url('menu/submanagement'));
+        }
+    }
+    public function hapussubmenu($id)
+    {
+        $idsubmenu = base64_decode($id);
+        $this->M_menu->hapussubmenu($idsubmenu);
+        $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => 'Berhasil Hapus']);
+        redirect(base_url('menu/submanagement'));
     }
 }

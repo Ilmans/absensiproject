@@ -11,7 +11,21 @@ class M_siswa extends CI_Model
 
         // return  $this->db->get('tabel_siswa')->result_array();
     }
+    public function datasiswaByKelas($idkelas, $idjurusan)
+    {
+        $where = [
+            'kode_kelas' => $idkelas,
+            'kode_jurusan' => $idjurusan
+        ];
+        return  $this->db->select('*')
+            ->from('tabel_siswa')
+            ->join('tabel_kelas', 'tabel_kelas.id_kelas = tabel_siswa.kode_kelas')
+            ->join('tabel_jurusan', 'tabel_jurusan.id_jurusan = tabel_siswa.kode_jurusan')
+            ->where($where)
+            ->get()->result_array();
+        // return $this->db->where($where)->get('tabel_siswa')->result_array();
 
+    }
     public function dataspesifiksiswa($nis)
     {
         return  $this->db->select('*')
@@ -60,5 +74,27 @@ class M_siswa extends CI_Model
     public function deletesiswa($idsiswa)
     {
         $this->db->delete('tabel_siswa', ['id_siswa' => $idsiswa]);
+    }
+
+    // absen siswa
+    public function CekSiswa($nis)
+    {
+        return $this->db->where('nis', $nis)
+            ->get('tabel_siswa')->num_rows();
+    }
+    // absen by siswa,
+    public function detailsiswa($nis)
+    {
+        return $this->db->where('nis', $nis)
+            ->get('tabel_siswa')->result_array();
+    }
+
+    //
+
+    public function DataSiswaByKelasDanJurusan()
+    {
+        $query = $this->db->query("SELECT DISTINCT kode_kelas,kode_jurusan FROM tabel_siswa");
+        $result = $query->result_array();
+        return $result;
     }
 }

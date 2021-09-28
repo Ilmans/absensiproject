@@ -41,7 +41,7 @@
                                 </thead>
                                 <tbody>
 
-                                    <?php foreach ($user as $u) : ?>
+                                    <?php foreach ($users as $u) : ?>
                                         <tr>
                                             <td><img class="rounded-circle" width="50" src="<?= base_url() ?>assets/images/user/<?= $u['image'] ?>" alt=""></td>
                                             <td><?= $u['name']; ?></td>

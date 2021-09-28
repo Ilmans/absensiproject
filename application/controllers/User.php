@@ -8,13 +8,21 @@ class User extends CI_Controller
         parent::__construct();
         $this->load->model('M_user');
         $this->load->library('form_validation');
+        if (!$this->session->userdata('id')) {
+            redirect(base_url('dashboard'));
+        }
     }
     public function index()
+
     {
+        $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
+        $url = $this->uri->segment(3);
+        verifikasiuser($datauser['role_id'], $url);
         $data = [
             'title' => WEBNAME . 'Data User',
             'webname' => WEBNAME,
-            'user' => $this->M_user->datauser()
+            'users' => $this->M_user->datauser(),
+            'user' =>  $this->M_user->getUserById($this->session->userdata('id'))[0]
         ];
         $this->load->view('templates/header', $data);
         $this->load->view('user/index');

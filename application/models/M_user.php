@@ -31,4 +31,27 @@ class M_user extends CI_Model
         $this->db->where('id', $iduser)
             ->update('tabel_user', $data);
     }
+
+    // verifi email
+    public function cekkodeunik($kodeunik, $email)
+    {
+        return $this->db->where(['email' => $email, 'kode_unik' => $kodeunik])
+            ->get('tabel_user')->num_rows();
+    }
+    public function aktifkanuser($email)
+    {
+        $data = [
+            'is_active' => 1
+        ];
+        $this->db->where('email', $email)->update('tabel_user', $data);
+    }
+
+    public function resetkodeunik($email)
+    {
+        $data = [
+            'kode_unik' => null
+        ];
+        $this->db->where('email', $email)->update('tabel_user', $data);
+    }
+    //
 }

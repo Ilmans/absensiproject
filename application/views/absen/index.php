@@ -1,6 +1,10 @@
 <div class="content-body">
     <!-- row -->
     <?php
+    $sqlsabtu = "SELECT status FROM tabel_libur WHERE type = 'weekend' AND keterangan = 'sabtu' ";
+    $sabtu = $this->db->query($sqlsabtu)->result_array()[0]['status'];
+    $sqlminggu = "SELECT status FROM tabel_libur WHERE type = 'weekend' AND keterangan = 'minggu' ";
+    $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
 
 
     ?>
@@ -29,29 +33,29 @@
 
                         <form action="" method="get" class="form-horizontal">
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label class="control-label">NIS</label>
                                     <div class="controls">
-                                        <input type="number" class="form-control" name="nis" />
+                                        <input type="number" value="<?= (isset($_GET['nis'])) ?  $_GET['nis'] : '' ?>" class="form-control" name="nis" />
                                     </div>
                                 </div>
 
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label class="control-label">Kelas </label>
                                     <div class="controls">
-                                        <select name="kelas" id="kelas" class="form-control" required>
-                                            <option value="0" disabled aria-required="">Pilih kelas..</option>
+                                        <select name="kelas" required="true" class="form-control" required>
+                                            <option value="" disabled selected>Pilih kelas..</option>
                                             <?php foreach ($kelas as $k) : ?>
                                                 <option value="<?= $k['id_kelas']; ?>"><?= $k['kelas']; ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label class="control-label">Bulan</label>
                                     <div class="controls">
-                                        <select name="bulan" id="kelas" class="form-control" required>
-                                            <option value="0" disabled>Pilih bulan..</option>
+                                        <select name="bulan" required="true" class="form-control">
+                                            <option value="" disabled selected>Pilih bulan..</option>
                                             <option value="01">Januari</option>
                                             <option value="02">Februari</option>
                                             <option value="03">Maret</option>
@@ -67,7 +71,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group col-md-3">
+                                <!-- <div class="form-group col-md-3">
                                     <label class="control-label">Tahun</label>
                                     <div class="controls">
                                         <select name="tahun" id="kelas" class="form-control" required>
@@ -79,12 +83,12 @@
                                             <option value="2025">2025</option>
                                         </select>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
 
 
                             <div class="form-actions">
-                                <button type="submit" name="cariabsen" value="isset" class="btn btn-success">Cari</button>
+                                <button type="submit" name="cariabsen" value="isset" class="btn-sm btn btn-secondary"> <i class="flaticon-381-search-1"></i> Cari Absen</button>
 
                             </div>
                         </form>
@@ -100,6 +104,29 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">Data Absen <?= $desc ?></h4>
+                        <?php
+                        $gettahun = date('Y');
+                        if (isset($_GET['cariabsen'])) {
+                            if (isset($_GET['kelas'])) {
+                                $getkelas = $_GET['kelas'];
+                            } else {
+                                $getkelas = 1;
+                            }
+                            if (isset($_GET['bulan'])) {
+                                $getbulan = $_GET['bulan'];
+                            } else {
+                                $getbulan = date('m');
+                            }
+                            if (isset($_GET['nis'])) {
+                                $getnis = $_GET['nis'];
+                            } else {
+                                $getnis = '';
+                            }
+                            $gett = 'nis=' . $getnis . '&kelas=' . $getkelas . '&bulan=' . $getbulan;
+                        } else {
+                            $gett = 'nis=&kelas=1&bulan=' . date('m');
+                        }
+                        ?>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -127,69 +154,158 @@
                                     </thead>
                                     <tbody>
                                         <?php foreach ($siswa as $d) :  ?>
+
                                             <tr>
                                                 <td><input type="checkbox" name="nis[]" value="<?PHP echo $d['nis']; ?>" /></td>
                                                 <td><?= $d['nis']; ?></td>
                                                 <td><?= $d['nama_siswa']; ?></td>
                                                 <td><?= $d['jenis_kelamin']; ?></td>
                                                 <?php
-
-                                                //mengabil tanggal 
                                                 $nomor2 = 1;
+                                                // $sisa_td = 30;
+                                                //mengabil tanggal 
                                                 $keterangan_alpha = 0;
                                                 $keterangan_izin = 0;
                                                 $keterangan_sakit = 0;
                                                 $keterangan_terlambat = 0;
-                                                foreach ($dataabsen as $da) {
-                                                    if ($da['nis'] == $d['nis']) {
-                                                        $ambil_tanggal = explode("-", $da['tanggal_absen']);
 
+                                                $nis = $d['nis'];
+                                                $kelass = $d['kode_kelas'];
+                                                $cari_bulan_siswa = date('m');
+                                                $tahun = date('Y');
+                                                if (isset($_GET['bulan']) && isset($_GET['kelas'])) {
+                                                    $bulan = $_GET['bulan'];
+                                                    $kelas = $_GET['kelas'];
+                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND kode_kelas = '$kelas' AND tanggal_absen LIKE '%$tahun-$bulan%' ORDER BY tanggal_absen ASC";
+                                                } else {
+                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  kode_kelas = '$kelass' AND tanggal_absen LIKE '%$tahun-$cari_bulan_siswa%' ORDER BY tanggal_absen ASC";
+                                                    $bulan = date('m');
+                                                }
+
+                                                $query = $this->db->query($sql);
+                                                if ($query->num_rows() > 0) {
+
+                                                    foreach ($query->result_array() as $absen) {
+                                                        //mengabil tanggal 
+                                                        $ambil_tanggal = explode("-", $absen['tanggal_absen']);
                                                         //merubah menjadi tanggal jadi integer
-                                                        $ambil_tanggal[2] = $ambil_tanggal[2];
-
-                                                        //perulangan kehadiran sesuai tanggal
+                                                        $ambil_tanggal[2] = (int)$ambil_tanggal[2];
                                                         for ($nomor = $nomor2; $nomor <= $ambil_tanggal[2]; $nomor++) {
+                                                            // mengetahui hari minggu
+                                                            $nomor < 10 ? $tgl = '0' . $nomor : $tgl = $nomor;
+                                                            $tanggal = date('Y') . '-' . $bulan . '-' . $tgl;
+                                                            $hari = date('D', strtotime($tanggal));
+                                                            //
+
+
+                                                            // cek libur
+                                                            $sqllibur = "SELECT * FROM tabel_libur WHERE tanggal = '$tahun-$bulan-$tgl' AND status = 'Aktif'";
+                                                            $datalibur = $this->db->query($sqllibur)->result_array();
+
+                                                            //
                                                             if ($nomor == $ambil_tanggal[2]) {
-                                                                if ($da['keterangan'] == 'h') {
-                                                                    echo '<td> <i class="fa fa-check"></i></td>';
+                                                                $sqlkeluar = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  tipe = 'Keluar' AND tanggal_absen = '$tahun-$bulan-$tgl'";
+                                                                $keluar = $this->db->query($sqlkeluar);
+
+
+                                                                if ($absen['keterangan'] == 'h') {
+                                                                    if ($keluar->num_rows() == 0) {
+                                                                        echo '<td>1/2</td>';
+                                                                    } else {
+                                                                        echo '<td> <i class="fa fa-check"></i></td>';
+                                                                    }
                                                                 } else {
-                                                                    echo "<td><b>" . strtoupper($da['keterangan']) . "</b></td>";
+                                                                    echo "<td><b>" . strtoupper($absen['keterangan']) . "</b></td>";
                                                                 }
                                                             } else {
-                                                                echo "<td></td>";
+                                                                if (count($datalibur) > 0) {
+                                                                    echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
+                                                                } else 
+                                                                if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                                    echo '<td class="bg-danger"></td>';
+                                                                } else {
+                                                                    echo '<td></td>';
+                                                                }
                                                             }
                                                         }
-                                                        // rekap bulanan
-                                                        if ($da['keterangan'] == 'a') {
-                                                            $keterangan_alpha++;
-                                                        } else if ($da['keterangan'] == 'i') {
-                                                            $keterangan_izin++;
-                                                        } else if ($da['keterangan'] == 's') {
-                                                            $keterangan_sakit++;
-                                                        } else if ($da['keterangan'] == 't') {
-                                                            $keterangan_alpha++;
-                                                        }
+                                                        //meng rekap bulannan
                                                         $nomor2 = $ambil_tanggal[2] + 1;
                                                         $sisa_td = 31 - $nomor2;
+                                                        if ($absen['keterangan'] == 'a') {
+                                                            $keterangan_alpha++;
+                                                        } else if ($absen['keterangan'] == 'i') {
+                                                            $keterangan_izin++;
+                                                        } else if ($absen['keterangan'] == 's') {
+                                                            $keterangan_sakit++;
+                                                        } else if ($absen['keterangan'] == 't') {
+                                                            $keterangan_alpha++;
+                                                        }
                                                     }
-                                                }
+                                                    for ($td = 0; $td <= $sisa_td; $td++) {
+                                                        $tgl = $nomor2 + $td;
+                                                        $tgl < 10 ? $tgl2 = '0' . $tgl : $tgl2 = $tgl;
+                                                        $tanggal = date('Y') . '-' . $bulan . '-' . $tgl2;
+                                                        $hari = date('D', strtotime($tanggal));
+                                                        // cek libur
+                                                        $sqllibur = "SELECT * FROM tabel_libur WHERE tanggal = '$tahun-$bulan-$tgl' AND status = 'Aktif'";
+                                                        $datalibur = $this->db->query($sqllibur)->result_array();
+
+                                                        //
 
 
-                                                if (isset($sisa_td) != true) {
+                                                        if (count($datalibur) > 0) {
+                                                            echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
+                                                        } else 
+                                                        if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                            echo '<td class="bg-danger"></td>';
+                                                        } else {
+                                                            echo '<td></td>';
+                                                        }
+                                                    }
+                                                    //tampilan rekap absen
+                                                    echo "<td>$keterangan_alpha</td>
+                                                <td>$keterangan_izin</td>
+                                                <td>$keterangan_sakit</td>
+                                                <td>$keterangan_terlambat</td>";
+                                                    $keterangan_alpha = 0;
+                                                    $keterangan_sakit = 0;
+                                                    $keterangan_izin = 0;
+                                                    $keterangan_terlambat = 0;
+                                                } else {
+
                                                     $sisa_td = 30;
+                                                    for ($td = 0; $td <= $sisa_td; $td++) {
+                                                        $tgl = $td + 1;
+                                                        $tgl < 10 ?  $tgl2 = '0' . $tgl : $tgl2 = $tgl;
+                                                        $tanggal = date('Y') . '-' . $bulan . '-' . $tgl;
+                                                        $hari = date('D', strtotime($tanggal));
+
+
+                                                        // cek libur
+                                                        $sqllibur = "SELECT * FROM tabel_libur WHERE tanggal = '$tahun-$bulan-$tgl' AND status = 'Aktif'";
+                                                        $datalibur = $this->db->query($sqllibur)->result_array();
+
+                                                        //
+
+
+                                                        if (count($datalibur) > 0) {
+                                                            echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
+                                                        } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                            echo '<td class="bg-danger"></td>';
+                                                        } else {
+                                                            echo '<td></td>';
+                                                        }
+                                                    }
+                                                    //tampilan rekap absen
+                                                    echo "<td>$keterangan_alpha</td>
+                                                <td>$keterangan_izin</td>
+                                                <td>$keterangan_sakit</td>
+                                                <td>$keterangan_terlambat</td>";
+                                                    $keterangan_alpha = 0;
+                                                    $keterangan_sakit = 0;
+                                                    $keterangan_izin = 0;
+                                                    $keterangan_terlambat = 0;
                                                 }
-                                                for ($td = 0; $td <= $sisa_td; $td++) {
-                                                    echo "<td></td>";
-                                                }
-                                                //tampilan rekap absen
-                                                echo "<td>$keterangan_alpha</td>
-                                            <td>$keterangan_izin</td>
-                                            <td>$keterangan_sakit</td>
-                                            <td>$keterangan_terlambat</td>";
-                                                $keterangan_alpha = 0;
-                                                $keterangan_sakit = 0;
-                                                $keterangan_izin = 0;
-                                                $keterangan_terlambat = 0;
                                                 ?>
                                             </tr>
                                         <?php endforeach; ?>
@@ -206,8 +322,6 @@
                         <h4 class="card-title">Pengabsenan</h4>
                     </div>
                     <div class="card-body">
-
-
                         <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash() ?>" />
                         <div class="form-group">
                             <label for="">Keterangan</label>
@@ -223,6 +337,13 @@
                             <input type="date" name="tgltahun" class="form-control" required>
                         </div>
                         <div class="form-group">
+                            <label for="">Tipe</label>
+                            <select name="tipe" class="form-control" id="" required>
+                                <option value="Masuk">Masuk</option>
+                                <option value="Keluar">Keluar</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="">Aksi</label>
                             <select name="aksi" class="form-control" id="" required>
                                 <option value="baru">Baru</option>
@@ -231,7 +352,7 @@
                             </select>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" name="klikabsen" class="btn btn-success">Absen</button>
+                            <button type="submit" name="klikabsen" class="btn-sm btn btn-secondary"> <i class="flaticon-381-edit"></i> Absen</button>
 
                         </div>
                         </form>

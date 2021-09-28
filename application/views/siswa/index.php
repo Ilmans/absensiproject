@@ -23,8 +23,8 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Data Siswa</h4>
-                        <a href="<?= base_url(); ?>siswa/add" class="btn btn-primary  tambahkelas    shadow">Tambah</a>
+                        <h4 class="card-title">Data Siswa </h4>
+                        <a href="<?= base_url(); ?>siswa/add" class="btn-sm btn btn-secondary  tambahkelas    shadow"> <i class="flaticon-381-add-2"></i> Tambah</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -39,6 +39,7 @@
                                         <th>Kelas</th>
                                         <th>Tanggal Lahir</th>
                                         <th>Nomor HP</th>
+                                        <th>QR</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -54,6 +55,13 @@
                                             <td><?= $s['kelas']; ?></td>
                                             <td><?= $s['tgl_lahir']; ?></td>
                                             <td><?= $s['no_telepon']; ?></td>
+                                            <td>
+                                                <?php
+                                                generateQrSiswa($s['nis'], 'siswa/' . $s['nis'] . '.png');
+                                                ?>
+                                                <img class="rounded-circle" width="50" src="<?= base_url() ?>assets/qr/siswa/<?= $s['nis'] ?>.png" alt="">
+
+                                            </td>
                                             <td>
                                                 <div class="d-flex">
                                                     <form action="<?= base_url(); ?>siswa/edit" method="POST">

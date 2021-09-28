@@ -16,6 +16,7 @@
     <!-- Datatable -->
     <link href="<?= base_url(); ?>assets/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
@@ -43,8 +44,9 @@
             Nav header start
         ***********************************-->
         <div class="nav-header">
-            <a href="index.html" class="brand-logo">
+            <a href="<?= base_url('dashboard') ?>" class="brand-logo">
                 <img class="logo-abbr" src="<?= base_url(); ?>assets/images/logo.png" alt="">
+
                 <img class="logo-compact" src="<?= base_url(); ?>assets/images/logo-text.png" alt="">
                 <img class="brand-title" src="<?= base_url(); ?>assets/images/logo-text.png" alt="">
             </a>
@@ -80,14 +82,14 @@
                             </div>
                         </div>
                         <ul class="navbar-nav header-right">
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <div class="input-group search-area d-xl-inline-flex d-none">
                                     <div class="input-group-append">
                                         <span class="input-group-text"><a href="javascript:void(0)"><i class="flaticon-381-search-2"></i></a></span>
                                     </div>
                                     <input type="text" class="form-control" placeholder="Search here...">
                                 </div>
-                            </li>
+                            </li> -->
                             <li class="nav-item dropdown notification_dropdown">
                                 <a class="nav-link  ai-icon" href="javascript:void(0)" role="button" data-toggle="dropdown">
                                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,28 +133,31 @@
 
                             <li class="nav-item dropdown header-profile">
                                 <a class="nav-link" href="javascript:void(0)" role="button" data-toggle="dropdown">
-                                    <img src="<?= base_url(); ?>assets/images/profile/17.jpg" width="20" alt="" />
+                                    <img src="<?= base_url('assets/img/Profile/') .  $user['image']; ?>" width="20" alt="" />
                                     <div class="header-info">
-                                        <span class="text-black"><strong>Peter Parkur</strong></span>
-                                        <p class="fs-12 mb-0">Super Admin</p>
+                                        <span class="text-black"><strong><?= $user['name'];  ?></strong></span>
+                                        <p class="fs-12 mb-0">
+                                            <?php
+                                            if ($user['role_id'] == 1) {
+                                                echo 'Administrator';
+                                            } else if ($user['role_id'] == 2) {
+                                                echo 'Siswa';
+                                            } else {
+                                                echo 'Kepala';
+                                            }
+                                            ?>
+                                        </p>
                                     </div>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <a href="<?= base_url(); ?>assets/app-profile.html" class="dropdown-item ai-icon">
+                                    <a href="<?= base_url('Admin/ProfileUser'); ?>" class="dropdown-item ai-icon">
                                         <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                             <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
                                         <span class="ml-2">Profile </span>
                                     </a>
-                                    <a href="<?= base_url(); ?>assets/email-inbox.html" class="dropdown-item ai-icon">
-                                        <svg id="icon-inbox" xmlns="http://www.w3.org/2000/svg" class="text-success" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                            <polyline points="22,6 12,13 2,6"></polyline>
-                                        </svg>
-                                        <span class="ml-2">Inbox </span>
-                                    </a>
-                                    <a href="<?= base_url(); ?>assets/page-login.html" class="dropdown-item ai-icon">
+                                    <a href="<?= base_url('auth/logout'); ?>" class="dropdown-item ai-icon">
                                         <svg id="icon-logout" xmlns="http://www.w3.org/2000/svg" class="text-danger" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                                             <polyline points="16 17 21 12 16 7"></polyline>
@@ -171,34 +176,56 @@
             Header end ti-comment-alt
         ***********************************-->
 
+        <?php
+        //mengambil role id yang lagi login user
+        $role_id = $user['role_id'];
+        $querymenu = "SELECT `user_menu`.`id`,`user_menu`.`menu`, `user_menu`.`icon` FROM `user_menu`
+       join `user_access_menu` on `user_menu`.`id` = `user_access_menu`.`menu_id`
+       WHERE `user_access_menu`.`role_id` = $role_id
+       ORDER BY `user_access_menu`.`menu_id` ASC
+       ";
 
+        $menu = $this->db->query($querymenu)->result_array();
+        // var_dump($menu);
+        // die;
+        ?>
         <!--**********************************
             Sidebar start
         ***********************************-->
         <div class="deznav">
             <div class="deznav-scroll">
                 <ul class="metismenu" id="menu">
-                    <li><a class=" ai-icon" href="<?= base_url(); ?>menu" aria-expanded="false">
+                    <li><a class=" ai-icon" href="<?= base_url(); ?>dashboard" aria-expanded="false">
                             <i class="flaticon-381-networking"></i>
                             <span class="nav-text">Beranda</span>
                         </a>
 
                     </li>
-                    <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
-                            <i class="flaticon-381-networking"></i>
-                            <span class="nav-text">Management Menu</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li><a href="<?= base_url(); ?>menu/kelasdanjurusan"> Kelas & Jurusan</a></li>
-                        </ul>
-                        <ul aria-expanded="false">
-                            <li><a href="<?= base_url(); ?>siswa"> Siswa</a></li>
-                        </ul>
-                        <ul aria-expanded="false">
-                            <li><a href="<?= base_url(); ?>user"> User</a></li>
-                        </ul>
-                    </li>
+                    <?php foreach ($menu as $m) : ?>
+                        <li><a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+                                <!--looping Nama Menu Dari Database -->
+                                <i class="<?= ($m['icon']); ?>"></i>
+                                <span class="nav-text"><?= $m['menu']; ?></span>
+                            </a>
+                            <!--Siapkan Sub Menu-->
+                            <?php
+                            $menuid = $m['id'];
+                            $querySubmenu = "SELECT *
+                                          FROM `user_sub_menu` JOIN `user_access_submenu` on `user_sub_menu`.`id` = `user_access_submenu`.`submenu_id`
+                                          WHERE `user_sub_menu`.`menu_id` =  $menuid AND user_access_submenu.role_id = $role_id
+                                          AND `user_sub_menu`.`is_active` = 1 
+                                          ";
+                            // $querySubmenu = "SELECT * FROM user_access_submenu JOIN "
+                            $Submenu = $this->db->query($querySubmenu)->result_array();
+                            ?>
 
+                            <?php foreach ($Submenu as $Submenu) : ?>
+                                <ul aria-expanded="false">
+                                    <li><a href="<?= base_url($Submenu['url']); ?>"><?= $Submenu['title'];  ?></a></li>
+                                </ul>
+                            <?php endforeach; ?>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
                 <!-- <div class="add-menu-sidebar">
                     <img src="images/calendar.png" alt="" class="mr-3">
@@ -206,7 +233,6 @@
                 </div> -->
                 <div class="copyright">
                     <p><strong><?= $webname; ?></strong> © 2020 All Rights Reserved</p>
-                    <p>Made with <span class="heart"></span> by ....</p>
                 </div>
             </div>
         </div>
