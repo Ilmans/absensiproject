@@ -89,4 +89,51 @@ class User extends CI_Controller
         $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Berhasil edit user']);
         redirect(base_url() . 'user');
     }
+
+
+    public function profile()
+    {
+        $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
+        $data = [
+            'title' => WEBNAME . 'Data User',
+            'webname' => WEBNAME,
+            'dataakun' => $datauser,
+            'user' =>  $this->M_user->getUserById($this->session->userdata('id'))[0]
+        ];
+        $this->load->view('templates/header', $data);
+        $this->load->view('user/profile');
+        $this->load->view('templates/footer');
+    }
+
+    public function ubahpassword()
+    {
+
+        $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
+        $current_password = $this->input->post('current_password');
+        $new_password = $this->input->post('new_password1');
+        if (!password_verify($current_password, $datauser['password'])) {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">
+				Password Sebelumnya salah !
+				</div>');
+            redirect('user/profile');
+        } else {
+
+            if ($current_password == $new_password) {
+                $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">
+					Password Baru Tidak Boleh Sama dengan Password yang Lama !
+					</div>');
+                redirect('user/profile');
+            } else {
+
+                // password Nya sudak Bener aliyas validasi yang di atas sudah lulus, maka  Pasword yang di inpukan akan di hash
+                $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
+                $this->db->set('password', $password_hash);
+                $this->db->where('email', $this->session->userdata('email'));
+                $this->db->update('tabel_user');
+
+                $this->session->set_flashdata('message', 'DI EDIT');
+                redirect(base_url('user/profile'));
+            }
+        }
+    }
 }
