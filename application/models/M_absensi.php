@@ -12,18 +12,23 @@ class M_absensi extends CI_Model
     }
 
 
-    public function CariSiswa($nis, $kelas)
+    public function CariSiswa($nis, $kelas, $jurusan)
     {
         $where = [
             'nis' => $nis,
-            'kode_kelas' => $kelas
+            'kode_kelas' => $kelas,
+            'kode_jurusan' => $jurusan
         ];
         return $this->db->where($where)->order_by('nama_siswa', 'ASC')
             ->get('tabel_siswa')->result_array();
     }
-    public function dataSiswaByKelas($kelas)
+    public function dataSiswaByKelas($kelas, $jurusan)
     {
-        return $this->db->where('kode_kelas', $kelas)->order_by('nama_siswa', 'ASC')
+        $where = [
+            'kode_kelas' => $kelas,
+            'kode_jurusan' => $jurusan
+        ];
+        return $this->db->where($where)->order_by('nama_siswa', 'ASC')
             ->get('tabel_siswa')->result_array();
     }
     public function cekliburnasional($tanggal)

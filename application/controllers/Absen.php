@@ -42,25 +42,26 @@ class Absen extends CI_Controller
         if ($this->input->get('cariabsen') != FALSE) {
             // deklarasi yang di cari
             $idkelas = $this->input->get('kelas');
+            $idjurusan = $this->input->get('jurusan');
             $bulan = $this->input->get('bulan');
             $tahun = $this->input->get('tahun');
             // pencarian dengan nis
             if ($this->input->get('nis') != FALSE) {
                 $nis = $this->input->get('nis');
-                $datasiswa = $this->M_absensi->CariSiswa($nis, $idkelas);
+                $datasiswa = $this->M_absensi->CariSiswa($nis, $idkelas, $idjurusan);
                 // deskripsi pencarian dengan nis
                 $desc = 'NIS ' . $nis . ' ( ' . $namabulan[$bulan] . ' ' . $tahun . ' )';
             } else {
                 // pencarian tanpa nis
-                $datasiswa = $this->M_absensi->dataSiswaByKelas($idkelas);
+                $datasiswa = $this->M_absensi->dataSiswaByKelas($idkelas, $idjurusan);
                 // deskripsi pencarian tanpa nis
-                $desc = 'Kelas ' . $this->M_kelas->ambilkelas($idkelas)[0]['kelas'] . ' ( ' . $namabulan[$bulan] . ' ' . date('Y') . ' )';
+                $desc = 'Kelas ' . $this->M_kelas->ambilkelas($idkelas)[0]['kelas'] . ' ' . $this->M_kelas->ambiljurusan($idjurusan)[0]['jurusan'] . ' ( ' . $namabulan[$bulan] . ' ' . date('Y') . ' )';
             }
         } else {
             // deskripsi
-            $desc = 'Kelas ' . $this->M_kelas->ambilkelas(1)[0]['kelas'] . ' ( ' . $namabulan[date('m')] . ' ' . date('Y') . ' )';
+            $desc = 'Kelas ' . $this->M_kelas->ambilkelas(1)[0]['kelas'] . ' ' . $this->M_kelas->ambiljurusan(1)[0]['jurusan'] . ' ( ' . $namabulan[date('m')] . ' ' . date('Y') . ' )';
             // defaul bulan dan kelas yang ditampilkan
-            $datasiswa = $this->M_absensi->dataSiswaByKelas(1);
+            $datasiswa = $this->M_absensi->dataSiswaByKelas(1, 1);
             // $dataabsen = $this->M_absensi->dataabsensi();
         }
         $data = [

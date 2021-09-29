@@ -16,6 +16,10 @@ class M_kelas extends CI_Model
     {
         return $this->db->where('id_kelas', $idkelas)->get('tabel_kelas')->result_array();
     }
+    public function ambiljurusan($idjurusan)
+    {
+        return $this->db->where('id_jurusan', $idjurusan)->get('tabel_jurusangi')->result_array();
+    }
     public function inputkelas()
     {
         $data = [

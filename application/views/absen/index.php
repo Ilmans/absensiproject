@@ -33,14 +33,14 @@
 
                         <form action="" method="get" class="form-horizontal">
                             <div class="form-row">
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <label class="control-label">NIS</label>
                                     <div class="controls">
                                         <input type="number" value="<?= (isset($_GET['nis'])) ?  $_GET['nis'] : '' ?>" class="form-control" name="nis" />
                                     </div>
                                 </div>
 
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <label class="control-label">Kelas </label>
                                     <div class="controls">
                                         <select name="kelas" required="true" class="form-control" required>
@@ -51,7 +51,18 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
+                                    <label class="control-label">Jurusan </label>
+                                    <div class="controls">
+                                        <select name="jurusan" required="true" class="form-control" required>
+                                            <option value="" disabled selected>Pilih Jurusan..</option>
+                                            <?php foreach ($jurusan as $j) : ?>
+                                                <option value="<?= $j['id_jurusan']; ?>"><?= $j['jurusan']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
                                     <label class="control-label">Bulan</label>
                                     <div class="controls">
                                         <select name="bulan" required="true" class="form-control">
@@ -171,14 +182,16 @@
 
                                                 $nis = $d['nis'];
                                                 $kelass = $d['kode_kelas'];
+                                                $jurusann = $d['kode_jurusan'];
                                                 $cari_bulan_siswa = date('m');
                                                 $tahun = date('Y');
                                                 if (isset($_GET['bulan']) && isset($_GET['kelas'])) {
                                                     $bulan = $_GET['bulan'];
                                                     $kelas = $_GET['kelas'];
-                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND kode_kelas = '$kelas' AND tanggal_absen LIKE '%$tahun-$bulan%' ORDER BY tanggal_absen ASC";
+                                                    $kelas = $_GET['jurusan'];
+                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND kode_kelas = '$kelas' AND kode_jurusan = '$jurusan' AND tanggal_absen LIKE '%$tahun-$bulan%' ORDER BY tanggal_absen ASC";
                                                 } else {
-                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  kode_kelas = '$kelass' AND tanggal_absen LIKE '%$tahun-$cari_bulan_siswa%' ORDER BY tanggal_absen ASC";
+                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  kode_kelas = '$kelass' AND kode_jurusan = '$jurusan' AND tanggal_absen LIKE '%$tahun-$cari_bulan_siswa%' ORDER BY tanggal_absen ASC";
                                                     $bulan = date('m');
                                                 }
 
@@ -204,16 +217,16 @@
 
                                                             //
                                                             if ($nomor == $ambil_tanggal[2]) {
-                                                                $sqlkeluar = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  tipe = 'Keluar' AND tanggal_absen = '$tahun-$bulan-$tgl'";
-                                                                $keluar = $this->db->query($sqlkeluar);
+                                                                // $sqlkeluar = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  tipe = 'Keluar' AND tanggal_absen = '$tahun-$bulan-$tgl'";
+                                                                // $keluar = $this->db->query($sqlkeluar);
 
 
                                                                 if ($absen['keterangan'] == 'h') {
-                                                                    if ($keluar->num_rows() == 0) {
-                                                                        echo '<td>1/2</td>';
-                                                                    } else {
-                                                                        echo '<td> <i class="fa fa-check"></i></td>';
-                                                                    }
+                                                                    // if ($keluar->num_rows() == 0) {
+                                                                    //     echo '<td>1/2</td>';
+                                                                    // } else {
+                                                                    echo '<td> <i class="fa fa-check"></i></td>';
+                                                                    //   }
                                                                 } else {
                                                                     echo "<td><b>" . strtoupper($absen['keterangan']) . "</b></td>";
                                                                 }
