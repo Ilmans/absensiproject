@@ -67,6 +67,7 @@ class Absen extends CI_Controller
             'title' => WEBNAME . ' Absensi',
             'webname' => WEBNAME,
             'kelas' => $this->M_kelas->tampilkelas(),
+            'jurusan' => $this->M_kelas->tampiljurusan(),
             'siswa' => $datasiswa,
             'desc' => $desc,
             'user' => $datauser

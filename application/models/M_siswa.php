@@ -93,7 +93,7 @@ class M_siswa extends CI_Model
 
     public function DataSiswaByKelasDanJurusan()
     {
-        $query = $this->db->query("SELECT DISTINCT kode_kelas,kode_jurusan FROM tabel_siswa");
+        $query = $this->db->query("SELECT DISTINCT kode_kelas,kode_jurusan FROM tabel_siswa ORDER BY kode_kelas ASC");
         $result = $query->result_array();
         return $result;
     }

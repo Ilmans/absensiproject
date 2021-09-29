@@ -27,7 +27,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="example" class="display min-w850">
+                            <table id="example3" class="display min-w850">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -47,7 +47,12 @@
                                             <td><?= $u['name']; ?></td>
                                             <td><?= $u['email']; ?></td>
                                             <td>
-                                                <div class="badge badge-primary">Admin</div>
+                                                <?php
+                                                $role = $u['role_id'];
+                                                $level = $this->db->query("SELECT role FROM tabel_user_role WHERE id = '$role' ")->result_array();
+
+                                                ?>
+                                                <div class="badge badge-secondary"><?= $level[0]['role'] ?></div>
                                             </td>
 
                                             <td><?= $u['is_active'] == 1 ? 'Aktif' : 'Non Aktif' ?></td>

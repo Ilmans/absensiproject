@@ -33,6 +33,20 @@
                                 </div>
                             </div>
                             <div class="form-group col-md-12">
+                                <label class="control-label">Level</label>
+                                <div class="controls">
+                                    <?php
+                                    $role = $this->db->query("SELECT * FROM tabel_user_role ")->result_array();
+                                    ?>
+                                    <select name="role" id="is_active" class="form-control" required>
+                                        <?php foreach ($role as $r) : ?>
+                                            <option value="<?= $r['id'] ?>" <?= $user['role_id'] == $r['id'] ? 'selected' : '' ?>><?= $r['role'] ?></option>
+                                        <?php endforeach; ?>
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
                                 <label class="control-label">status</label>
                                 <div class="controls">
                                     <select name="is_active" id="is_active" class="form-control" required>

@@ -7,6 +7,10 @@ class M_kelas extends CI_Model
     {
         return $this->db->get('tabel_kelas')->result_array();
     }
+    public function tampiljurusan()
+    {
+        return $this->db->get('tabel_jurusan')->result_array();
+    }
 
     public function ambilkelas($idkelas)
     {

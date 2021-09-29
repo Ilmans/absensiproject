@@ -16,7 +16,7 @@ class User extends CI_Controller
 
     {
         $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
-        $url = $this->uri->segment(3);
+        $url = $this->uri->segment(1);
         verifikasiuser($datauser['role_id'], $url);
         $data = [
             'title' => WEBNAME . 'Data User',
@@ -135,5 +135,50 @@ class User extends CI_Controller
                 redirect(base_url('user/profile'));
             }
         }
+    }
+
+
+    // page data user siswa
+    public function user_siswa()
+    {
+        $datauser = $this->M_user->getUserById($this->session->userdata('id'))[0];
+        $url = $this->uri->segment(1) . '/' . $this->uri->segment(2);
+        verifikasiuser($datauser['role_id'], $url);
+        $data = [
+            'title' => WEBNAME . 'User Login siswa',
+            'webname' => WEBNAME,
+            'usersiswa' => $this->M_user->getusersiswa(),
+            'titleedit' => 'Ubah Log siswa',
+            'user' =>  $this->M_user->getUserById($this->session->userdata('id'))[0]
+
+        ];
+        $this->load->view('templates/header', $data);
+        $this->load->view('user/Usersiswa');
+        $this->load->view('templates/footer');
+    }
+    public function editlogsiswa()
+    {
+        $this->form_validation->set_rules('nis', 'menu', 'required|trim', [
+            'required' => 'Menu Tidak Boleh kosong'
+        ]);
+        $this->form_validation->set_rules('email', 'icon', 'required|trim|valid_email', [
+            'required' => 'Icon Tidak Boleh kosong',
+            'valid_email' => 'Yang anda masukan bukan email'
+        ]);
+        if ($this->form_validation->run() == false) {
+            $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => validation_errors()]);
+        } else {
+            $this->M_user->edit();
+            $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Berhasil edit Log user siswa']);
+        }
+        redirect('User/logsiswa');
+    }
+    public function deletelogsiswa($id)
+    {
+        //message adalah parameter untuk membuat pesan
+        $id = base64_decode($id);
+        $this->M_user->deletelog($id);
+        $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => 'Berhasil Hapus']);
+        redirect('User/logsiswa');
     }
 }

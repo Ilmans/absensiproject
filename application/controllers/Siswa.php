@@ -36,7 +36,7 @@ class Siswa extends CI_Controller
             $idjurusan = $this->input->get('jurusan');
             $siswa = $this->M_siswa->datasiswaByKelas($idkelas, $idjurusan);
         }
-        $this->load->library('ciqrcode');
+        // $this->load->library('ciqrcode');
         $this->load->helper('sf_helper');
 
         $data = [

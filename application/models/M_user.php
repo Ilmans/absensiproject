@@ -25,6 +25,7 @@ class M_user extends CI_Model
             'name' => $this->input->post('nama', true),
             'email' => $this->input->post('email', true),
             'image' => $foto,
+            'role_id' => $this->input->post('role'),
             'is_active' => $this->input->post('is_active', true)
         ];
         $iduser = $this->input->post('id_user');
@@ -53,5 +54,36 @@ class M_user extends CI_Model
         ];
         $this->db->where('email', $email)->update('tabel_user', $data);
     }
-    //
+    // for data user siswa
+    public function getusersiswa()
+    {
+        return  $this->db->select('login_siswa.id,login_siswa.nis_siswa,tabel_siswa.nama_siswa,login_siswa.email,login_siswa.`password`,login_siswa.is_active,login_siswa.kode_unik ')
+            ->from('login_siswa')
+            ->join('tabel_siswa ', 'login_siswa.nis_siswa = tabel_siswa.nis')
+            ->get()->result();
+    }
+    public function edit()
+    {
+        $id = $this->input->post('id');
+        $email = $this->input->post('email', true);
+        $nis = $this->input->post('nis', true);
+        $status = $this->input->post('is_active', true);
+        $data = array(
+            'id'                       => $id,
+            'email'                    => $email,
+            'nis_siswa'                => $nis,
+            'is_active'                => $status,
+
+        );
+        $where = array(
+            'id' => $id
+        );
+        $this->db->where($where)
+            ->update('login_siswa', $data);
+    }
+    public function deletelog($id)
+    {
+        $this->db
+            ->delete('login_siswa', ['id' => $id]);
+    }
 }

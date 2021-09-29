@@ -133,7 +133,6 @@
 
                                     <thead>
                                         <tr>
-                                            <th rowspan="2"><input type="checkbox" id="title-table-checkbox" name="title-table-checkbox"></th>
                                             <th rowspan=" 2">Nomor induk siswa</th>
                                             <th rowspan=" 2">Nama</th>
                                             <th rowspan="2">L/P</th>
@@ -153,7 +152,6 @@
                                         <?php foreach ($siswa as $d) :  ?>
 
                                             <tr>
-                                                <td><input type="checkbox" name="nis[]" value="<?PHP echo $d['nis']; ?>" /></td>
                                                 <td><?= $d['nis']; ?></td>
                                                 <td><?= $d['nama_siswa']; ?></td>
                                                 <td><?= $d['jenis_kelamin']; ?></td>
