@@ -65,8 +65,8 @@
 											// cek absen hari ini
 											$tgl = date('Y-m-d');
 											$nis = $user['nis'];
-											$masuk = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tanggal_absen = '$tgl' AND tipe = 'Masuk' ")->num_rows();
-											$keluar = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tanggal_absen = '$tgl' AND tipe = 'Keluar' ")->num_rows();
+											$masuk = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tanggal_absen = '$tgl' AND masuk = '1' ")->num_rows();
+											$keluar = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tanggal_absen = '$tgl' AND keluar = '1' ")->num_rows();
 											?>
 
 											<tr>

@@ -45,7 +45,7 @@ class M_absensi extends CI_Model
             ->result_array();
     }
     // absen input
-    public function inputabsen($nis, $idkelas)
+    public function inputabsen($nis, $idkelas, $idjurusan)
     {
         $jam = time();
         $data = [
@@ -54,34 +54,51 @@ class M_absensi extends CI_Model
             'nis' => $nis,
             'keterangan' => $this->input->post('keterangan', true),
             'kode_kelas' => $idkelas,
-            'tipe' => $this->input->post('tipe', true),
+            'kode_jurusan' => $idjurusan,
+            'masuk' => 1,
+            'keluar' => 1
         ];
         $this->db->insert('tabel_detail_absen', $data);
     }
+    public function updateabsen($nis, $idkelas, $idjurusan)
+    {
+        $where = [
+            'nis' => $nis,
+            'kode_kelas' => $idkelas,
+            'kode_jurusan' => $idjurusan,
+        ];
+        $update = [
+            'keterangan' =>  $this->input->post('keterangan', true),
+        ];
+        $this->db->where($where)->update($update);
+    }
     // edit absen
-    public function editabsen($nis, $idkelas)
+    public function editabsen($nis, $idkelas, $jurusan)
     {
         $data = [
             'jam_absen' => time(),
-            'keterangan' => $this->input->post('keterangan')
+            'keterangan' => $this->input->post('keterangan'),
+            'masuk' => 1,
+            'keluar' => 1
         ];
 
         $where = [
             'nis' => $nis,
             'tanggal_absen' => $this->input->post('tgltahun'),
             'kode_kelas' => $idkelas,
-            'tipe' => 'Masuk',
+            'kode_jurusan' => $jurusan
         ];
         $this->db->where($where)
             ->update('tabel_detail_absen', $data);
     }
-    public function hapusabsen($nis, $idkelas)
+    public function hapusabsen($nis, $idkelas, $idjurusan)
     {
         $where = [
             'nis' => $nis,
             'tanggal_absen' => $this->input->post('tgltahun'),
             // 'keterangan' => $this->input->post('keterangan'),
-            'kode_kelas' => $idkelas
+            'kode_kelas' => $idkelas,
+            'kode_jurusan' => $idjurusan
         ];
         $this->db->delete('tabel_detail_absen', $where);
     }
@@ -98,7 +115,9 @@ class M_absensi extends CI_Model
             'nis' => $datasiswa['nis'],
             'keterangan' => $absen,
             'kode_kelas' => $datasiswa['kode_kelas'],
-            'tipe' => $type
+            'kode_jurusan' => $datasiswa['kode_jurusan'],
+            'masuk' => 1,
+            'keluar' => 0
         ];
         $this->db->insert('tabel_detail_absen', $data);
     }

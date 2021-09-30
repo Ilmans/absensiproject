@@ -171,13 +171,18 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
                             $keterangan_sakit = 0;
                             $keterangan_terlambat = 0;
                             $nis = $d['nis'];
+                            $kelass = $d['kode_kelas'];
+                            $jurusann = $d['kode_jurusan'];
                             $cari_bulan_siswa = date('m');
                             $tahun = date('Y');
-                            if (isset($_GET['bulan'])) {
+                            if (isset($_GET['bulan']) && isset($_GET['kelas'])) {
                                 $bulan = $_GET['bulan'];
-                                $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tanggal_absen LIKE '%$tahun-$bulan%' ";
+                                $kelas = $_GET['kelas'];
+                                $jurusann = $_GET['jurusan'];
+                                $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND kode_kelas = '$kelas' AND kode_jurusan = '$jurusann' AND tanggal_absen LIKE '%$tahun-$bulan%' ORDER BY tanggal_absen ASC";
                             } else {
-                                $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tanggal_absen LIKE '%$tahun-$cari_bulan_siswa%' ORDER BY tanggal_absen ASC";
+                                $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  kode_kelas = '$kelass' AND kode_jurusan = '$jurusann' AND tanggal_absen LIKE '%$tahun-$cari_bulan_siswa%' ORDER BY tanggal_absen ASC";
+                                $bulan = date('m');
                             }
                             $query = $this->db->query($sql);
                             if ($query->num_rows() > 0) {
@@ -198,27 +203,25 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
 
                                         //
                                         if ($nomor == $ambil_tanggal[2]) {
+                                            if ($nomor == $ambil_tanggal[2]) {
 
-
-                                            $sqlkeluar = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  tipe = 'Keluar' AND tanggal_absen = '$tahun-$bulan-$tgl'";
-                                            $keluar = $this->db->query($sqlkeluar);
-
-
-                                            if ($absen['keterangan'] == 'h') {
-                                                if ($keluar->num_rows() == 0) {
-                                                    echo '<td>1/2</td>';
+                                                if (count($datalibur) > 0) {
+                                                    echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
+                                                } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                    echo '<td class="libur"></td>';
                                                 } else {
-                                                    echo '<td class="hadir"> <i class="hadir"></i></td>';
+                                                    if ($absen['keterangan'] == 'h') {
+                                                        if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
+                                                            echo '<td class="hadir"></td>';
+                                                        } else {
+                                                            echo "<td><b>1/2</b></td>";
+                                                        }
+                                                    } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
+                                                        echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
+                                                    } else {
+                                                        echo '<td></td>';
+                                                    }
                                                 }
-                                            } else {
-                                                echo "<td><b>" . strtoupper($absen['keterangan']) . "</b></td>";
-                                            }
-                                        } else {
-                                            if (count($datalibur) > 0) {
-                                                echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
-                                            } else 
-                                            if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
-                                                echo '<td class="libur"></td>';
                                             } else {
                                                 echo '<td></td>';
                                             }
@@ -243,17 +246,25 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
                                     $tanggal = date('Y') . '-' . $bulan . '-' . $tgl2;
                                     $hari = date('D', strtotime($tanggal));
                                     // cek libur
-                                    $sqllibur = "SELECT * FROM tabel_libur WHERE tanggal = '$tahun-$bulan-$tgl' AND status = 'Aktif'";
-                                    $datalibur = $this->db->query($sqllibur)->result_array();
+                                    if ($nomor == $ambil_tanggal[2]) {
 
-                                    //
-
-
-                                    if (count($datalibur) > 0) {
-                                        echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
-                                    } else 
-                                    if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
-                                        echo '<td class="libur"></td>';
+                                        if (count($datalibur) > 0) {
+                                            echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
+                                        } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                            echo '<td class="libur"></td>';
+                                        } else {
+                                            if ($absen['keterangan'] == 'h') {
+                                                if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
+                                                    echo '<td class="hadir"></td>';
+                                                } else {
+                                                    echo "<td><b>1/2</b></td>";
+                                                }
+                                            } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
+                                                echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
+                                            } else {
+                                                echo '<td></td>';
+                                            }
+                                        }
                                     } else {
                                         echo '<td></td>';
                                     }
@@ -282,11 +293,25 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
                                     //
 
 
-                                    if (count($datalibur) > 0) {
-                                        echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
-                                    } else 
-                                    if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
-                                        echo '<td class="libur"></td>';
+                                    if ($nomor == $ambil_tanggal[2]) {
+
+                                        if (count($datalibur) > 0) {
+                                            echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
+                                        } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                            echo '<td class="libur"></td>';
+                                        } else {
+                                            if ($absen['keterangan'] == 'h') {
+                                                if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
+                                                    echo '<td class="hadir"></td>';
+                                                } else {
+                                                    echo "<td><b>1/2</b></td>";
+                                                }
+                                            } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
+                                                echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
+                                            } else {
+                                                echo '<td></td>';
+                                            }
+                                        }
                                     } else {
                                         echo '<td></td>';
                                     }

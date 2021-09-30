@@ -24,21 +24,17 @@ class Ajax extends CI_Controller
         $minggu = $this->M_absensi->cekstatusweekend('minggu');
         //$tgl = explode('-', $tanggal)[2];
         if (date('D', strtotime($tanggal)) == 'Sun' && $minggu[0]['status'] == 'Aktif') {
-            echo json_encode(['status' => 'libur', 'message' => 'liburr']);
-            die;
-        } else if (date('D', strtotime($tanggal)) == 'Sat' && $sabtu[0]['status'] == 'Aktif') {
-            echo json_encode(['status' => 'libur', 'message' => 'liburr']);
+            echo json_encode(['status' => 'false', 'alert' => 'danger', 'message' => 'Sekarang Libur weekend, tidak bisa absen sekarang libur weekend!']);
             die;
         } else   if ($c > 0) {
-            echo json_encode(['status' => 'libur', 'message' => 'liburr']);
+            echo json_encode(['status' => 'false', 'alert' => 'danger', 'message' => 'Sekarang Libur , tidak bisa absen ']);
             die;
         }
 
         if ($this->M_siswa->CekSiswa($nis) < 1) {
-            $result = ['status' => 'invalide', 'message' => 'invalid qr'];
+            $result = ['status' => 'false', 'alert' => 'danger', 'message' => 'Kode QR Tidak terbaca, silahkan gunakan kode QR yang VALID'];
             echo json_encode($result);
         } else {
-
             // cek jam absen
             $jam_masuk = $this->db->query("SELECT * FROM tabel_jam_absen WHERE type = 'Masuk' ")->result_array()[0]['mulai'];
             $jam_selesai_masuk = $this->db->query("SELECT * FROM tabel_jam_absen WHERE type = 'Masuk' ")->result_array()[0]['selesai'];
@@ -48,24 +44,45 @@ class Ajax extends CI_Controller
 
             if (strtotime($sekarang) >= strtotime($jam_masuk) && strtotime($sekarang) < strtotime($jam_selesai_masuk) && strtotime($sekarang)) {
                 $absen = 'h';
-                $type = 'Masuk';
+                $type = 'masuk';
             } else if (strtotime($sekarang) > strtotime($jam_telat_masuk) && strtotime($sekarang) < strtotime($jam_keluar)) {
                 $absen = 't';
-                $type = 'Masuk';
+                $type = 'masuk';
             } else if (strtotime($sekarang) >= strtotime($jam_keluar) && strtotime($sekarang) > strtotime($jam_selesai_masuk)) {
                 $absen = 'h';
-                $type = 'Keluar';
+                $type = 'keluar';
             }
             $tglskrg = date('Y-m-d');
-            $cekabsen = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tipe = '$type' AND tanggal_absen = '$tglskrg' ")->num_rows();
-            if ($cekabsen > 0) {
-                $result2 = ['status' => 'already', 'message' => 'sudahabsen'];
-                echo json_encode($result2);
-            } else {
-                $datasiswa = $this->M_siswa->detailsiswa($nis);
-                $datasiswa2 = $datasiswa[0];
-                $this->M_absensi->inputAbsenBySiswa($datasiswa2, $absen, $type);
-                echo json_encode($datasiswa);
+            $cekabsen = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND masuk = '1' AND tanggal_absen = '$tglskrg' ")->num_rows();
+            if ($type == 'masuk') {
+                if ($cekabsen > 0) {
+                    $result2 = ['status' => 'false', 'alert' => 'success', 'message' => 'Kamu sudah absen masuk hari ini, selamat beraktivitas :)'];
+                    echo json_encode($result2);
+                } else {
+                    $datasiswa = $this->M_siswa->detailsiswa($nis);
+                    $datasiswa2 = $datasiswa[0];
+                    $this->M_absensi->inputAbsenBySiswa($datasiswa2, $absen, $type);
+                    $pesannya = 'Ananda ' . $datasiswa2['nama_siswa'] . ' telah absen masuk hari ini pada pukul ' . date('H:i:s');
+                    $this->M_notif->send_whatsapp($datasiswa2['no_telepon'], $pesannya);
+                    echo json_encode(array_merge($datasiswa2, ['status' => 'true']));
+                }
+            } else if ($type == 'keluar') {
+                $cekabsenkeluar =     $cekabsen = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND keluar = '1' AND tanggal_absen = '$tglskrg' ")->num_rows();
+                if ($cekabsen == 0) {
+                    $result3 = ['status' => 'false', 'alert' => 'danger', 'message' => 'Kamu tidak bisa absen keluar , karna tidak ada data absen masuk kamu hari ini!'];
+                    echo json_encode($result3);
+                } else if ($cekabsenkeluar > 0) {
+                    $result3 = ['status' => 'false', 'alert' => 'success', 'message' => 'Kamu sudah absen keluar hari ini, selamat beristirahat!'];
+                    echo json_encode($result3);
+                } else {
+                    $this->db->query("UPDATE tabel_detail_absen SET keluar = '1' WHERE nis ='$nis' AND tanggal_absen = '$tanggal' AND masuk = '1'");
+                    $datasiswa = $this->M_siswa->detailsiswa($nis);
+                    $datasiswa2 = $datasiswa[0];
+
+                    $pesannya = 'Ananda ' . $datasiswa2['nama_siswa'] . ' telah absen keluar hari ini pada pukul ' . date('H:i:s');
+                    $this->M_notif->send_whatsapp($datasiswa2['no_telepon'], $pesannya);
+                    echo json_encode(array_merge($datasiswa2, ['status' => 'true']));
+                }
             }
         }
     }
@@ -234,7 +251,8 @@ berikut link untuk meneruskan pengaitan akun anda
             $tanggal = $dataizin['tanggal_izin'];
             $dataizin['type'] == 'Sakit' ? $keterangan = 's' : $keterangan = 'i';
             $kodekelas = $dataizin['kode_kelas'];
-            $this->db->query("INSERT INTO tabel_detail_absen VALUES ('','$jam','$tanggal','$nis','$keterangan','$kodekelas','other')");
+            $kodejurusan = $dataizin['kode_jurusan'];
+            $this->db->query("INSERT INTO tabel_detail_absen VALUES ('','$jam','$tanggal','$nis','$keterangan','$kodekelas','$kodejurusan','1','1')");
             $this->db->query("UPDATE tabel_izin SET status = 'Diterima'  WHERE id = '$idizin'");
             $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => 'Izin berhasil di konfirmasi, terima']);
         } else if ($aksi == 'Ditolak') {

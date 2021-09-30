@@ -59,7 +59,8 @@ class Data extends CI_Controller
     public function cetak_kartu()
     {
         $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' => $this->session->userdata('role_id')]);
-
+        $this->load->helper('sf_helper');
+        generateQrSiswa($datauser['nis_siswa'], 'siswa/' . $datauser['nis_siswa'] . '.png');
         function encode_img_base64($img_path = false, $img_type = 'png')
         {
             if ($img_path) {

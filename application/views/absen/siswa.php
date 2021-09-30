@@ -267,23 +267,19 @@
                 },
                 dataType: 'json',
                 success: function(data) {
-                    if (data.status == 'already') {
-                        $('.fotoprofil').html('<h1 class="text-success text-center mt-4">Anda Sudah absen masuk Hari ini, Selamat Bersekolah :)</h1>');
+                    if (data.status == 'false') {
+                        $('.fotoprofil').html(`<h1 class="text-${data.alert} text-center mt-4">${data.message}</h1>`);
                         $('.namasiswa').html('');
                         $('.tanggal').html('');
-                    } else if (data.status == 'invalide') {
-                        $('.fotoprofil').html('<h1 class="text-danger text-center mt-4">Kode QR tidak dikenali / rusak, silahkan generate kode qr baru atau hubungi kordinator sekolah</h1>')
-                    } else if (data.status == 'libur') {
-                        $('.fotoprofil').html('<h1 class="text-warning text-center mt-4">Hari ini sedang libur, selamat berlibur.</h1>')
-                    } else {
-
-                        let image = data[0]['gambar'];
+                    } else if (data.status == 'true') {
+                        console.log(data);
+                        let image = data['gambar'];
                         let tanggal = `${r.getDate()} ${bulan(r.getMonth())} ${r.getFullYear()} - ${r.getHours()}:${r.getMinutes()}:${r.getSeconds()}`;
                         $('.textberhasil').html('Berhasil absen');
                         $('.fotoprofil').html(
                             `<img src="<?= base_url() ?>assets/images/user/${image}" alt="" width="300" height="300">`
                         );
-                        $('.namasiswa').html(data[0]['nama_siswa']);
+                        $('.namasiswa').html(data['nama_siswa']);
                         $('.tanggal').html(tanggal);
                     }
                 },
@@ -350,23 +346,18 @@
                 },
                 dataType: 'json',
                 success: function(data) {
-                    if (data.status == 'already') {
-                        $('.fotoprofil').html('<h1 class="text-success text-center mt-4">Anda Sudah absen keluar Hari ini, Selamat Beristirahat :)</h1>')
+                    if (data.status == 'false') {
+                        $('.fotoprofil').html(`<h1 class="text-${data.alert} text-center mt-4">${data.message}</h1>`);
                         $('.namasiswa').html('');
                         $('.tanggal').html('');
-                    } else if (data.status == 'invalide') {
-                        $('.fotoprofil').html('<h1 class="text-danger text-center mt-4">Kode QR tidak dikenali / rusak, silahkan generate kode qr baru atau hubungi kordinator sekolah</h1>')
-                    } else if (data.status == 'libur') {
-                        $('.fotoprofil').html('<h1 class="text-warning text-center mt-4">Hari ini sedang libur, selamat berlibur.</h1>')
-                    } else {
-
-                        let image = data[0]['gambar'];
+                    } else if (data.status == 'true') {
+                        let image = data['gambar'];
                         let tanggal = `${r.getDate()} ${bulan(r.getMonth())} ${r.getFullYear()} - ${r.getHours()}:${r.getMinutes()}:${r.getSeconds()}`;
                         $('.textberhasil').html('Berhasil absen');
                         $('.fotoprofil').html(
                             `<img src="<?= base_url() ?>assets/images/user/${image}" alt="" width="300" height="300">`
                         );
-                        $('.namasiswa').html(data[0]['nama_siswa']);
+                        $('.namasiswa').html(data['nama_siswa']);
                         $('.tanggal').html(tanggal);
                     }
                 },

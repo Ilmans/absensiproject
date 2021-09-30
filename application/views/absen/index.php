@@ -39,7 +39,6 @@
                                         <input type="number" value="<?= (isset($_GET['nis'])) ?  $_GET['nis'] : '' ?>" class="form-control" name="nis" />
                                     </div>
                                 </div>
-
                                 <div class="form-group col-md-3">
                                     <label class="control-label">Kelas </label>
                                     <div class="controls">
@@ -188,17 +187,19 @@
                                                 if (isset($_GET['bulan']) && isset($_GET['kelas'])) {
                                                     $bulan = $_GET['bulan'];
                                                     $kelas = $_GET['kelas'];
-                                                    $kelas = $_GET['jurusan'];
-                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND kode_kelas = '$kelas' AND kode_jurusan = '$jurusan' AND tanggal_absen LIKE '%$tahun-$bulan%' ORDER BY tanggal_absen ASC";
+                                                    $jurusann = $_GET['jurusan'];
+                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND kode_kelas = '$kelas' AND kode_jurusan = '$jurusann' AND tanggal_absen LIKE '%$tahun-$bulan%' ORDER BY tanggal_absen ASC";
                                                 } else {
-                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  kode_kelas = '$kelass' AND kode_jurusan = '$jurusan' AND tanggal_absen LIKE '%$tahun-$cari_bulan_siswa%' ORDER BY tanggal_absen ASC";
+                                                    $sql = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  kode_kelas = '$kelass' AND kode_jurusan = '$jurusann' AND tanggal_absen LIKE '%$tahun-$cari_bulan_siswa%' ORDER BY tanggal_absen ASC";
                                                     $bulan = date('m');
                                                 }
 
                                                 $query = $this->db->query($sql);
+
                                                 if ($query->num_rows() > 0) {
 
                                                     foreach ($query->result_array() as $absen) {
+
                                                         //mengabil tanggal 
                                                         $ambil_tanggal = explode("-", $absen['tanggal_absen']);
                                                         //merubah menjadi tanggal jadi integer
@@ -208,37 +209,32 @@
                                                             $nomor < 10 ? $tgl = '0' . $nomor : $tgl = $nomor;
                                                             $tanggal = date('Y') . '-' . $bulan . '-' . $tgl;
                                                             $hari = date('D', strtotime($tanggal));
-                                                            //
-
-
                                                             // cek libur
                                                             $sqllibur = "SELECT * FROM tabel_libur WHERE tanggal = '$tahun-$bulan-$tgl' AND status = 'Aktif'";
                                                             $datalibur = $this->db->query($sqllibur)->result_array();
 
                                                             //
                                                             if ($nomor == $ambil_tanggal[2]) {
-                                                                // $sqlkeluar = "SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND  tipe = 'Keluar' AND tanggal_absen = '$tahun-$bulan-$tgl'";
-                                                                // $keluar = $this->db->query($sqlkeluar);
 
-
-                                                                if ($absen['keterangan'] == 'h') {
-                                                                    // if ($keluar->num_rows() == 0) {
-                                                                    //     echo '<td>1/2</td>';
-                                                                    // } else {
-                                                                    echo '<td> <i class="fa fa-check"></i></td>';
-                                                                    //   }
-                                                                } else {
-                                                                    echo "<td><b>" . strtoupper($absen['keterangan']) . "</b></td>";
-                                                                }
-                                                            } else {
                                                                 if (count($datalibur) > 0) {
                                                                     echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
-                                                                } else 
-                                                                if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                                } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
                                                                     echo '<td class="bg-danger"></td>';
                                                                 } else {
-                                                                    echo '<td></td>';
+                                                                    if ($absen['keterangan'] == 'h') {
+                                                                        if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
+                                                                            echo '<td> <i class="fa fa-check"></i></td>';
+                                                                        } else {
+                                                                            echo "<td><b>1/2</b></td>";
+                                                                        }
+                                                                    } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
+                                                                        echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
+                                                                    } else {
+                                                                        echo '<td></td>';
+                                                                    }
                                                                 }
+                                                            } else {
+                                                                echo '<td></td>';
                                                             }
                                                         }
                                                         //meng rekap bulannan
@@ -263,14 +259,25 @@
                                                         $sqllibur = "SELECT * FROM tabel_libur WHERE tanggal = '$tahun-$bulan-$tgl' AND status = 'Aktif'";
                                                         $datalibur = $this->db->query($sqllibur)->result_array();
 
-                                                        //
+                                                        if ($td == $tgl) {
 
-
-                                                        if (count($datalibur) > 0) {
-                                                            echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
-                                                        } else 
-                                                        if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
-                                                            echo '<td class="bg-danger"></td>';
+                                                            if (count($datalibur) > 0) {
+                                                                echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
+                                                            } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                                echo '<td class="bg-danger"></td>';
+                                                            } else {
+                                                                if ($absen['keterangan'] == 'h') {
+                                                                    if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
+                                                                        echo '<td> <i class="fa fa-check"></i></td>';
+                                                                    } else {
+                                                                        echo "<td><b>1/2</b></td>";
+                                                                    }
+                                                                } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
+                                                                    echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
+                                                                } else {
+                                                                    echo '<td></td>';
+                                                                }
+                                                            }
                                                         } else {
                                                             echo '<td></td>';
                                                         }
@@ -298,13 +305,25 @@
                                                         $sqllibur = "SELECT * FROM tabel_libur WHERE tanggal = '$tahun-$bulan-$tgl' AND status = 'Aktif'";
                                                         $datalibur = $this->db->query($sqllibur)->result_array();
 
-                                                        //
+                                                        if ($td == $tgl) {
 
-
-                                                        if (count($datalibur) > 0) {
-                                                            echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
-                                                        } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
-                                                            echo '<td class="bg-danger"></td>';
+                                                            if (count($datalibur) > 0) {
+                                                                echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';
+                                                            } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                                echo '<td class="bg-danger"></td>';
+                                                            } else {
+                                                                if ($absen['keterangan'] == 'h') {
+                                                                    if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
+                                                                        echo '<td> <i class="fa fa-check"></i></td>';
+                                                                    } else {
+                                                                        echo "<td><b>1/2</b></td>";
+                                                                    }
+                                                                } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
+                                                                    echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
+                                                                } else {
+                                                                    echo '<td></td>';
+                                                                }
+                                                            }
                                                         } else {
                                                             echo '<td></td>';
                                                         }
@@ -345,17 +364,13 @@
                                 <option value="t">Terlambat</option>
                             </select>
                         </div>
+                        <input type="hidden" name="url" value="<?= $_SERVER['REQUEST_URI'] ?>" id="">
+
                         <div class="form-group">
                             <label for="">Tanggal</label>
                             <input type="date" name="tgltahun" class="form-control" required>
                         </div>
-                        <div class="form-group">
-                            <label for="">Tipe</label>
-                            <select name="tipe" class="form-control" id="" required>
-                                <option value="Masuk">Masuk</option>
-                                <option value="Keluar">Keluar</option>
-                            </select>
-                        </div>
+
                         <div class="form-group">
                             <label for="">Aksi</label>
                             <select name="aksi" class="form-control" id="" required>

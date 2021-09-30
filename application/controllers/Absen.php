@@ -80,8 +80,9 @@ class Absen extends CI_Controller
 
     public function input()
     {
+
         $tanggal = $this->input->post('tgltahun');
-        $type = $this->input->post('tipe');
+        // $type = $this->input->post('tipe');
         // cek libur nasional 
         $c =  $this->M_absensi->cekliburnasional($tanggal);
         $sabtu = $this->M_absensi->cekstatusweekend('sabtu');
@@ -98,31 +99,28 @@ class Absen extends CI_Controller
             foreach ($this->input->post('nis') as $n) {
                 $siswa = $this->M_siswa->dataspesifiksiswa($n)[0];
                 if ($this->input->post('aksi') == 'baru') {
-                    $cekabsen = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$n' AND tanggal_absen = '$tanggal' AND tipe = '$type' ");
+                    $cekabsen = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$n' AND tanggal_absen = '$tanggal' ");
                     if ($cekabsen->num_rows() < 1) {
-                        $this->M_absensi->inputabsen($siswa['nis'], $siswa['kode_kelas']);
+                        $this->M_absensi->inputabsen($siswa['nis'], $siswa['kode_kelas'], $siswa['kode_jurusan']);
+                        $message = 'Berhasil Absen';
+                    } else {
+                        $message = 'sudah ada data absen siswa pada tanggal tersebut, silahkan edit jika ingin mengubah';
                     }
-                    $message = 'Berhasil Absen';
                 } else if ($this->input->post('aksi') == 'edit') {
                     // edit asen
-                    $nis = $siswa['nis'];
-                    $absenkeluar = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND tipe = 'Keluar' AND tanggal_absen = '$tanggal'");
-
-                    if ($absenkeluar->num_rows() > 0) {
-                        $id = $absenkeluar->result_array()[0]['id_detail'];
-                        $this->M_absensi->hapusabsenById($id);
-                    }
-                    $this->M_absensi->editabsen($siswa['nis'], $siswa['kode_kelas']);
+                    $this->M_absensi->editabsen($siswa['nis'], $siswa['kode_kelas'], $siswa['kode_jurusan']);
                     $message = 'Berhasil edit absen';
                 } else if ($this->input->post('aksi') == 'hapus') {
-                    $this->M_absensi->hapusabsen($siswa['nis'], $siswa['kode_kelas']);
+                    $this->M_absensi->hapusabsen($siswa['nis'], $siswa['kode_kelas'], $siswa['kode_jurusan']);
                     $message = 'Berhasil hapus absen';
                     // hapus absen
                 }
             }
             $this->session->set_flashdata('flash', ['alert' => 'success', 'message' => $message]);
         }
-        redirect(base_url() . 'absen');
+        $url = $this->input->post('url');
+
+        redirect('http://' . $_SERVER['HTTP_HOST'] . $url);
     }
 
 
@@ -134,33 +132,35 @@ class Absen extends CI_Controller
         if ($this->input->get('cariabsen') != FALSE) {
             // deklarasi yang di cari
             $idkelas = $this->input->get('kelas');
+            $idjurusan = $this->input->get('jurusan');
             $bulan = $this->input->get('bulan');
             $tahun = $this->input->get('tahun');
             // pencarian dengan nis
             if ($this->input->get('nis') != FALSE) {
                 $nis = $this->input->get('nis');
-                $datasiswa = $this->M_absensi->CariSiswa($nis, $idkelas);
+                $datasiswa = $this->M_absensi->CariSiswa($nis, $idkelas, $idjurusan);
                 // deskripsi pencarian dengan nis
                 $desc = 'NIS ' . $nis . ' ( ' . $namabulan[$bulan] . ' ' . $tahun . ' )';
             } else {
                 // pencarian tanpa nis
-                $datasiswa = $this->M_absensi->dataSiswaByKelas($idkelas);
+                $datasiswa = $this->M_absensi->dataSiswaByKelas($idkelas, $idjurusan);
                 // deskripsi pencarian tanpa nis
-                $desc = 'Kelas ' . $this->M_kelas->ambilkelas($idkelas)[0]['kelas'] . ' ( ' . $namabulan[$bulan] . ' ' . date('Y') . ' )';
+                $desc = 'Kelas ' . $this->M_kelas->ambilkelas($idkelas)[0]['kelas'] . ' ' . $this->M_kelas->ambiljurusan($idjurusan)[0]['jurusan'] . ' ( ' . $namabulan[$bulan] . ' ' . date('Y') . ' )';
             }
         } else {
             // deskripsi
-            $desc = 'Kelas ' . $this->M_kelas->ambilkelas(1)[0]['kelas'] . ' ( ' . $namabulan[date('m')] . ' ' . date('Y') . ' )';
+            $desc = 'Kelas ' . $this->M_kelas->ambilkelas(1)[0]['kelas'] . ' ' . $this->M_kelas->ambiljurusan(1)[0]['jurusan'] . ' ( ' . $namabulan[date('m')] . ' ' . date('Y') . ' )';
             // defaul bulan dan kelas yang ditampilkan
-            $datasiswa = $this->M_absensi->dataSiswaByKelas(1);
+            $datasiswa = $this->M_absensi->dataSiswaByKelas(100, 100);
             // $dataabsen = $this->M_absensi->dataabsensi();
         }
         $data = [
             'title' => WEBNAME . ' Absensi',
             'webname' => WEBNAME,
             'kelas' => $this->M_kelas->tampilkelas(),
+            'jurusan' => $this->M_kelas->tampiljurusan(),
             'siswa' => $datasiswa,
-            'desc' => $desc
+            'desc' => $desc,
         ];
 
         $this->load->library('pdf');
@@ -181,31 +181,33 @@ class Absen extends CI_Controller
         if ($this->input->get('cariabsen') != FALSE) {
             // deklarasi yang di cari
             $idkelas = $this->input->get('kelas');
+            $idjurusan = $this->input->get('jurusan');
             $bulan = $this->input->get('bulan');
             $tahun = $this->input->get('tahun');
             // pencarian dengan nis
             if ($this->input->get('nis') != FALSE) {
                 $nis = $this->input->get('nis');
-                $datasiswa = $this->M_absensi->CariSiswa($nis, $idkelas);
+                $datasiswa = $this->M_absensi->CariSiswa($nis, $idkelas, $idjurusan);
                 // deskripsi pencarian dengan nis
                 $desc = 'NIS ' . $nis . ' ( ' . $namabulan[$bulan] . ' ' . $tahun . ' )';
             } else {
                 // pencarian tanpa nis
-                $datasiswa = $this->M_absensi->dataSiswaByKelas($idkelas);
+                $datasiswa = $this->M_absensi->dataSiswaByKelas($idkelas, $idjurusan);
                 // deskripsi pencarian tanpa nis
-                $desc = 'Kelas ' . $this->M_kelas->ambilkelas($idkelas)[0]['kelas'] . ' ( ' . $namabulan[$bulan] . ' ' . date('Y') . ' )';
+                $desc = 'Kelas ' . $this->M_kelas->ambilkelas($idkelas)[0]['kelas'] . ' ' . $this->M_kelas->ambiljurusan($idjurusan)[0]['jurusan'] . ' ( ' . $namabulan[$bulan] . ' ' . date('Y') . ' )';
             }
         } else {
             // deskripsi
-            $desc = '';
+            $desc = 'Kelas ' . $this->M_kelas->ambilkelas(1)[0]['kelas'] . ' ' . $this->M_kelas->ambiljurusan(1)[0]['jurusan'] . ' ( ' . $namabulan[date('m')] . ' ' . date('Y') . ' )';
             // defaul bulan dan kelas yang ditampilkan
-            $datasiswa = $this->M_absensi->dataSiswaByKelas(0);
+            $datasiswa = $this->M_absensi->dataSiswaByKelas(100, 100);
             // $dataabsen = $this->M_absensi->dataabsensi();
         }
         $data = [
             'title' => WEBNAME . ' Absensi',
             'webname' => WEBNAME,
             'kelas' => $this->M_kelas->tampilkelas(),
+            'jurusan' => $this->M_kelas->tampiljurusan(),
             'siswa' => $datasiswa,
             'desc' => $desc,
             'user' => $datauser
