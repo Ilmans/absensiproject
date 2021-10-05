@@ -12,7 +12,7 @@ class Data extends CI_Controller
         if (!$this->session->userdata('id_siswa')) {
             redirect(base_url() . 'student/auth');
         }
-        if ($this->session->userdata('role_id') != 'siswa') {
+        if ($this->session->userdata('level') != 'siswa') {
             echo 'Anda tidak diizinkan untuk akses halaman ini';
             exit;
         }
@@ -22,7 +22,7 @@ class Data extends CI_Controller
     public function absen()
     {
         $this->load->helper('sf_helper');
-        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' => $this->session->userdata('role_id')]);
+        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['level' => $this->session->userdata('level')]);
 
         $this->load->model('M_absensi');
 
@@ -41,7 +41,7 @@ class Data extends CI_Controller
     public function libur()
     {
         $this->load->helper('sf_helper');
-        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' => $this->session->userdata('role_id')]);
+        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['level' => $this->session->userdata('level')]);
 
         $datalibur = $this->M_data->datalibur();
         $data = [
@@ -58,7 +58,7 @@ class Data extends CI_Controller
 
     public function cetak_kartu()
     {
-        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' => $this->session->userdata('role_id')]);
+        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['level' => $this->session->userdata('level')]);
         $this->load->helper('sf_helper');
         generateQrSiswa($datauser['nis_siswa'], 'siswa/' . $datauser['nis_siswa'] . '.png');
         function encode_img_base64($img_path = false, $img_type = 'png')
@@ -97,7 +97,7 @@ class Data extends CI_Controller
     public function profile()
     {
         $this->load->helper('sf_helper');
-        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' => $this->session->userdata('role_id')]);
+        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['level' => $this->session->userdata('level')]);
         $dataakun = $this->M_data->dataakunsiswa($this->session->userdata('nis'))[0];
 
         $data = [

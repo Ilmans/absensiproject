@@ -212,7 +212,7 @@ berikut link untuk meneruskan pengaitan akun anda
             if ($siswa['is_active'] == 1) {
                 if (password_verify($password, $siswa['password'])) {
                     $datasiswa = $biosiswa;
-                    $sessionsiswa = array_merge($datasiswa, ['role_id' => 'siswa']);
+                    $sessionsiswa = array_merge($datasiswa, ['level' => 'siswa']);
                     $this->session->set_userdata($sessionsiswa);
                     $result = ['status' => true, 'data' => base_url() . 'student/dashboard'];
                 } else {

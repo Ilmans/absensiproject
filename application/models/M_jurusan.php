@@ -11,7 +11,7 @@ class M_jurusan extends CI_Model
     public function tambahjurusan()
     {
         $data = [
-            'id_jurusan' => 'JURUSAN' . random_int(100, 999),
+            'id_jurusan' => '',
             'jurusan' => $this->input->post('namajurusan', true)
         ];
 
