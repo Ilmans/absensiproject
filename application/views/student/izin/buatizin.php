@@ -38,7 +38,7 @@
                             <div class="form-group">
                                 <label for="bukti">Bukti</label>
                                 <input class="form-control" type="file" name="bukti" id="bukti">
-                                <span class="text-small text-danger">Kirim gambar/foto atau dokumen</span>
+                                <span class="text-small text-danger">Input foto bukti </span>
                             </div>
                             <div class="form-group">
                                 <label for="keterangan">Keterangan</label>

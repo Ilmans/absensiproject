@@ -103,6 +103,7 @@
             dataType: 'json',
             success: function(data) {
                 $('.buttonnya').html(`<p class="badge badge-secondary">Permintaan Izin Ini sudah ${data.status}</p>`)
+                $('.bukti_izin').html(`<img src="<?= base_url() ?>assets/images/izinsiswa/${data.file_bukti}">`)
                 $('.modal-title').html(`Data Izin ${data.nama_siswa}`)
                 $('#keterangan_izin').html(`${data.keterangan}`);
                 $('#id_izin').attr('value', idizin);

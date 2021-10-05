@@ -13,14 +13,14 @@ class Izin extends CI_Controller
         if (!$this->session->userdata('id_siswa')) {
             redirect(base_url() . 'student/auth');
         }
-        if ($this->session->userdata('role_id') != 'siswa') {
+        if ($this->session->userdata('level') != 'siswa') {
             echo 'Anda tidak diizinkan untuk akses halaman ini';
             exit;
         }
     }
     public function index()
     {
-        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' => $this->session->userdata('role_id')]);
+        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['level' => $this->session->userdata('level')]);
 
         $data = [
             'title' => WEBNAME . 'Siswa Dashboard',
@@ -34,22 +34,21 @@ class Izin extends CI_Controller
 
     public function kirimpermintaan()
     {
-        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' =>
-        $this->session->userdata('role_id')]);
+        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['level' =>
+        $this->session->userdata('level')]);
         $config['upload_path'] = './assets/images/izinsiswa';
-        $config['allowed_types'] = 'jpg|jpeg|png|pdf|docx';
-        $config['file_name'] = 'izin-' . $datauser['nama_siswa'] . '-' . date('Y-m-d');
+        $config['allowed_types'] = 'jpg|jpeg|png';
+        $config['file_name'] = 'izin-' . $datauser['nis_siswa'] . '-' . date('Y-m-d');
         $config['max_size'] = 2000;
         $this->load->library('upload', $config);
-
-        $this->form_validation->set_rules(
-            'tanggal',
-            'Tanggal',
-            'is_unique[tabel_izin.tanggal_izin]',
-            [
-                'is_unique' => 'Kamu sudah izin hari ini, hanya bisa satu kali izin dalam satu hari'
-            ]
-        );
+        $tanggal = $this->input->post('tanggal');
+        $nis = $datauser['nis_siswa'];
+        $cekizin = $this->db->query("SELECT * FROM tabel_izin WHERE nis_siswa = '$nis' AND tanggal_izin = '$tanggal'")->num_rows();
+        if ($cekizin > 0) {
+            $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => 'Hanya bisa izin satu kali dalam satu hari!']);
+            redirect(base_url('student/izin'));
+            exit;
+        }
         $this->form_validation->set_rules('keterangan', 'keterangan', 'min_length[50]|trim', [
             'min_length' => 'Keterangan minimal 50 karakter!'
         ]);
@@ -71,8 +70,8 @@ class Izin extends CI_Controller
     // halaman data izin
     public function data()
     {
-        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['role_id' =>
-        $this->session->userdata('role_id')]);
+        $datauser = array_merge($this->M_auth->getUserByNis($this->session->userdata('nis'))[0], ['level' =>
+        $this->session->userdata('level')]);
 
         $this->load->helper('sf_helper');
         $data = [

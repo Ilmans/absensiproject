@@ -48,6 +48,17 @@
 					<div class="row">
 						<div class="col-md-12">
 							<div class="card">
+								<div class="card-body">
+									<a href="<?= base_url('student/izin') ?>" class="btn-sm btn btn-primary"> <i class="flaticon-381-notepad"></i> Izin tidak masuk</a>
+									<a href="<?= base_url('student/data/cetak_kartu') ?>" class="flaticon-381-print-1 btn-sm btn btn-secondary">Kartu Absen</a>
+
+
+
+								</div>
+							</div>
+						</div>
+						<div class="col-12">
+							<div class="card">
 								<div class="card-header">
 									<p class="card-title">Status Absen Hari ini <?= hari_ini() . ' ' . date('d') . ' ' . nama_bulan(date('m')) . ' ' . date('Y') ?> </p>
 								</div>
@@ -57,7 +68,7 @@
 											<tr>
 												<th class="width80">Masuk</th>
 												<th>Keluar</th>
-												<th>Aksi</th>
+
 											</tr>
 										</thead>
 										<tbody>
@@ -73,7 +84,7 @@
 												<?php
 
 												if ($liburr == 'ada') : ?>
-													<td><span class="badge light badge-secondary">Libur</span></td>
+													<td><span class="badge light badge-secondary text-small">Libur</span></td>
 													<td><span class="badge light badge-secondary">Libur</span></td>
 												<?php endif; ?>
 												<?php if ($liburr == 'tidak ada') : ?>
@@ -81,11 +92,6 @@
 
 													<td><span class="badge light badge-<?= $keluar > 0 ? 'success' : 'danger' ?>"><?= $keluar > 0 ? 'Sudah absen' : 'Belum absen' ?></span></td>
 												<?php endif; ?>
-												<td>
-													<a href="<?= base_url('student/izin') ?>" class="btn-sm btn btn-primary"> <i class="flaticon-381-notepad"></i> Izin tidak masuk</a>
-													<a href="<?= base_url('student/data/cetak_kartu') ?>" class="flaticon-381-print-1 btn-sm btn btn-secondary"> Cetak kartu absen</a>
-
-												</td>
 
 
 											</tr>

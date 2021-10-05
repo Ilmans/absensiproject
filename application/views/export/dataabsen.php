@@ -3,7 +3,7 @@
 <head>
     <style>
         html {
-            font-size: 15px;
+            font-size: 10px;
         }
 
         body {
@@ -32,7 +32,7 @@
 
         .table-wrapper {
             overflow: auto;
-            margin-top: 200px;
+            margin-top: 20px;
         }
 
         .text-center {
@@ -50,12 +50,12 @@
         .table-siswa td {
             border: 1px solid silver;
             position: relative;
-            padding: 5px;
+            padding: 2px;
         }
 
         .td-date .date {
             display: inline-block;
-            width: 25px;
+            width: 20px;
         }
 
         .label-checkbox {
@@ -131,6 +131,43 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
 
 <body>
     <main>
+        <?php
+        function encode_img_base64($img_path = false, $img_type = 'png')
+        {
+            if ($img_path) {
+                //convert image into Binary data
+                $img_data = fopen($img_path, 'rb');
+                $img_size = filesize($img_path);
+                $binary_image = fread($img_data, $img_size);
+                fclose($img_data);
+
+                //Build the src string to place inside your img tag
+                $img_src = "data:image/" . $img_type . ";base64," . str_replace("\n", "", base64_encode($binary_image));
+
+                return $img_src;
+            }
+
+            return false;
+        }
+        $path = './assets/images/logo.png';
+        $logo = encode_img_base64($path);
+
+        isset($_GET['bulan']) ? $bulan = nama_bulan($_GET['bulan']) : $bulan = nama_bulan(date('m'));
+        $kelas = $_GET['kelas'];
+        $jurusann = $_GET['jurusan'];
+        $jurusannya = $this->db->query("SELECT * FROM tabel_jurusan WHERE id_jurusan = '$jurusann' ")->result_array()[0]['jurusan'];
+        ?>
+        <div>
+            <table width="100%">
+                <tr>
+                    <td width="80" align="left"><img src="<?= $logo ?>" width="100%"></td>
+                    <td width="80" align="center">
+                        <h1><?= WEBNAME ?></h1>
+                        <h2>Catatan Absen Kelas <?= $kelas . ' ' . $jurusannya . ' Bulan ' . $bulan ?> </h2>
+                    </td>
+                </tr>
+            </table>
+        </div>
         <div class="table-wrapper">
             <table class="table-siswa" border="8" cellpadding="5">
 
@@ -202,31 +239,31 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
                                         $datalibur = $this->db->query($sqllibur)->result_array();
 
                                         //
-                                        if ($nomor == $ambil_tanggal[2]) {
-                                            if ($nomor == $ambil_tanggal[2]) {
 
-                                                if (count($datalibur) > 0) {
-                                                    echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
-                                                } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
-                                                    echo '<td class="libur"></td>';
-                                                } else {
-                                                    if ($absen['keterangan'] == 'h') {
-                                                        if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
-                                                            echo '<td class="hadir"></td>';
-                                                        } else {
-                                                            echo "<td><b>1/2</b></td>";
-                                                        }
-                                                    } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
-                                                        echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
-                                                    } else {
-                                                        echo '<td></td>';
-                                                    }
-                                                }
+                                        if ($nomor == $ambil_tanggal[2]) {
+
+                                            if (count($datalibur) > 0) {
+                                                echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
+                                            } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {
+                                                echo '<td class="libur"></td>';
                                             } else {
-                                                echo '<td></td>';
+                                                if ($absen['keterangan'] == 'h') {
+                                                    if ($absen['masuk'] == 1 && $absen['keluar'] == 1) {
+                                                        echo '<td class="hadir"></td>';
+                                                    } else {
+                                                        echo "<td><b>1/2</b></td>";
+                                                    }
+                                                } else if ($absen['keterangan'] == 's' || $absen['keterangan'] == 'a' || $absen['keterangan'] == 'i') {
+                                                    echo "<td><b>" . strtoupper($absen['keterangan']) . " </b></td>";
+                                                } else {
+                                                    echo '<td></td>';
+                                                }
                                             }
+                                        } else {
+                                            echo '<td></td>';
                                         }
                                     }
+
                                     //meng rekap bulannan
                                     $nomor2 = $ambil_tanggal[2] + 1;
                                     $sisa_td = 31 - $nomor2;
@@ -246,7 +283,7 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
                                     $tanggal = date('Y') . '-' . $bulan . '-' . $tgl2;
                                     $hari = date('D', strtotime($tanggal));
                                     // cek libur
-                                    if ($nomor == $ambil_tanggal[2]) {
+                                    if ($td == $tgl) {
 
                                         if (count($datalibur) > 0) {
                                             echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
@@ -282,7 +319,7 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
 
                                 $sisa_td = 30;
                                 for ($td = 0; $td <= $sisa_td; $td++) {
-                                    $tgl = $nomor2 + $td;
+                                    $tgl = $td + 1;
                                     $tgl < 10 ? $tgl2 = '0' . $tgl : $tgl2 = $tgl;
                                     $tanggal = date('Y') . '-' . $bulan . '-' . $tgl2;
                                     $hari = date('D', strtotime($tanggal));
@@ -293,8 +330,7 @@ $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
                                     //
 
 
-                                    if ($nomor == $ambil_tanggal[2]) {
-
+                                    if ($td == $tgl) {
                                         if (count($datalibur) > 0) {
                                             echo '<td class="libur">' . $datalibur[0]['keterangan'] . '</td>';
                                         } else if ($hari == 'Sun' && $minggu == 'Aktif' || $hari == 'Sat' && $sabtu == 'Aktif') {

@@ -1,6 +1,10 @@
 <div class="content-body">
     <!-- row -->
     <?php
+    $sqlsabtu = "SELECT status FROM tabel_libur WHERE type = 'weekend' AND keterangan = 'sabtu' ";
+    $sabtu = $this->db->query($sqlsabtu)->result_array()[0]['status'];
+    $sqlminggu = "SELECT status FROM tabel_libur WHERE type = 'weekend' AND keterangan = 'minggu' ";
+    $minggu = $this->db->query($sqlminggu)->result_array()[0]['status'];
 
 
     ?>
@@ -113,7 +117,15 @@
                                                             $nomor < 10 ? $tgl = '0' . $nomor : $tgl = $nomor;
                                                             $tanggal = date('Y') . '-' . $bulan . '-' . $tgl;
                                                             $hari = date('D', strtotime($tanggal));
+
                                                             if ($nomor == $ambil_tanggal[2]) {
+
+                                                                $nomor < 10 ? $tgl = '0' . $nomor : $tgl = $nomor;
+                                                                $tanggal = date('Y') . '-' . $bulan . '-' . $tgl;
+                                                                $hari = date('D', strtotime($tanggal));
+                                                                // cek libur
+
+
 
                                                                 if (count($datalibur) > 0) {
                                                                     echo '<td class="bg-danger">' . $datalibur[0]['keterangan'] . '</td>';

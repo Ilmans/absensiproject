@@ -31,7 +31,7 @@
                                         <th>Nis Siswa</th>
                                         <th>Email</th>
                                         <th>Nama Siswa</th>
-                                        <th>password</th>
+
                                         <th>is_active</th>
                                         <th>kode_unik</th>
                                         <th>Aksi</th>
@@ -45,7 +45,6 @@
                                             <td><span class="badge light badge-primary"><?php echo $user->nis_siswa; ?></span></td>
                                             <td><?php echo $user->email; ?></td>
                                             <td><?php echo $user->nama_siswa; ?></td>
-                                            <td><span class="badge light badge-success"><?php echo $user->password; ?></span></td>
                                             <td><?php echo $user->is_active; ?></td>
                                             <td><?php echo $user->kode_unik; ?></td>
                                             <td>

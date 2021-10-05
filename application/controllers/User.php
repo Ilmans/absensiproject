@@ -153,7 +153,7 @@ class User extends CI_Controller
 
         ];
         $this->load->view('templates/header', $data);
-        $this->load->view('user/Usersiswa');
+        $this->load->view('user/usersiswa');
         $this->load->view('templates/footer');
     }
     public function editlogsiswa()
@@ -179,6 +179,6 @@ class User extends CI_Controller
         $id = base64_decode($id);
         $this->M_user->deletelog($id);
         $this->session->set_flashdata('flash', ['alert' => 'danger', 'message' => 'Berhasil Hapus']);
-        redirect('User/logsiswa');
+        redirect('User/user _siswa');
     }
 }

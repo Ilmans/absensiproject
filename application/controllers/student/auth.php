@@ -10,7 +10,7 @@ class Auth extends CI_Controller
     }
     public function index()
     {
-        if ($this->session->userdata('id_siswa') && $this->session->userdata('role_id') == 'siswa') {
+        if ($this->session->userdata('id_siswa') && $this->session->userdata('level') == 'siswa') {
             redirect(base_url() . 'student/dashboard');
         } else {
             $this->load->view('student/auth/login');

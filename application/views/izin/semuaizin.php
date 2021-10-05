@@ -242,6 +242,8 @@
 
                 $('.modal-title').html(`Data Izin ${data.nama_siswa}`)
                 $('#keterangan_izin').html(`${data.keterangan}`);
+                $('.bukti_izin').html(`<img src="<?= base_url() ?>assets/images/izinsiswa/${data.file_bukti}" width="200px" height="200px">`)
+
                 $('#id_izin').attr('value', idizin);
                 $('#nis').attr('value', data.nis_siswa);
                 $('#kodekelas').attr('value', data.kode_kelas);
