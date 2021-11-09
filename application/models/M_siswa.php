@@ -7,6 +7,7 @@ class M_siswa extends CI_Model
         return  $this->db->select('*')
             ->from('tabel_siswa')
             ->join('tabel_kelas', 'tabel_kelas.id_kelas = tabel_siswa.kode_kelas')
+            ->join('tabel_jurusan', 'tabel_jurusan.id_jurusan = tabel_siswa.kode_jurusan')
             ->get()->result_array();
 
         // return  $this->db->get('tabel_siswa')->result_array();
@@ -43,7 +44,7 @@ class M_siswa extends CI_Model
             'jenis_kelamin' => $this->input->post('jeniskelamin', true),
             'alamat' => $this->input->post('alamat', true),
             'no_telepon' => $nohp,
-            'kode_jurusan' => 'default',
+            'kode_jurusan' =>  $this->input->post('jurusan', true),
             'kode_kelas' => $this->input->post('kelas', true),
             'gambar' => 'default'
         ];
@@ -65,6 +66,7 @@ class M_siswa extends CI_Model
             'jenis_kelamin' => $this->input->post('jeniskelamin'),
             'alamat' => $this->input->post('alamat', true),
             'no_telepon' => $nomorhp,
+            'kode_jurusan' => $this->input->post('jurusan'),
             'kode_kelas' => $this->input->post('kelas')
 
         ];

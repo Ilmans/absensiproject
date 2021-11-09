@@ -11,7 +11,7 @@
         ***********************************-->
 <div class="footer">
     <div class="copyright">
-        <p>Copyright © Designed &amp; Developed by <a href="http://dexignzone.com/" target="_blank">DexignZone</a> 2020</p>
+        <p>Copyright © <a href="https://m-pedia.id/" target="_blank">M Pedia</a> 2020</p>
     </div>
 </div>
 <!--**********************************
@@ -47,10 +47,10 @@
 <script src="<?= base_url(); ?>assets/vendor/peity/jquery.peity.min.js"></script>
 
 <!-- Apex Chart -->
-<script src="<?= base_url(); ?>assets/vendor/apexchart/apexchart.js"></script>
+<!-- <script src="<?= base_url(); ?>assets/vendor/apexchart/apexchart.js"></script> -->
 
 <!-- Dashboard 1 -->
-<script src="<?= base_url(); ?>assets/js/dashboard/dashboard-1.js"></script>
+<!-- <script src="<?= base_url(); ?>assets/js/dashboard/dashboard-1.js"></script> -->
 
 <!-- Datatable -->
 <script src="<?= base_url(); ?>assets/vendor/datatables/js/jquery.dataTables.min.js"></script>

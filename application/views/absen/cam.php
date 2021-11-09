@@ -42,7 +42,7 @@
                         </select>
                     </div>
                     <div class="card-body " id="bodybody">
-                        <div class="embed-responsive embed-responsive-21by9">
+                        <div class="embed-responsive embed-responsive-21by9" id="view">
                             <video src="" id="qr-video"></video>
                         </div>
                         <?php
@@ -85,6 +85,7 @@
                         <div class="infoabsen mt-3">
                             <h2 class="namasiswa"></h2>
                             <h4 class="tanggal"></h4>
+                            <h4 class="infotambahan"></h4>
                         </div>
 
 
@@ -232,7 +233,8 @@
                         $('.namasiswa').html('');
                         $('.tanggal').html('');
                     } else if (data.status == 'true') {
-                        console.log(data);
+                        // console.log(data);
+                    } else if (data.status == 'already') {
                         let image = data['gambar'];
                         let tanggal = `${r.getDate()} ${bulan(r.getMonth())} ${r.getFullYear()} - ${r.getHours()}:${r.getMinutes()}:${r.getSeconds()}`;
                         $('.textberhasil').html('Berhasil absen');
@@ -241,6 +243,9 @@
                         );
                         $('.namasiswa').html(data['nama_siswa']);
                         $('.tanggal').html(tanggal);
+                        $('.infotambahan').html(`<h1 class="text-success text-center mt-4">${data.message}</h1>`);
+
+
                     }
                 },
                 error: function() {
@@ -282,6 +287,7 @@
                 var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
                 $('.informasi').html(`<h1>Silahkan absen masuk,Berlaku  ${hours} Jam ${minutes} Menit ${seconds} detik Lagi</h1>`)
                 // document.getElementById("bodybody").innerHTML = days + " Hari " + hours + " Jam " +
                 //     minutes + " Menit " + seconds + " Detik ";

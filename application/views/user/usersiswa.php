@@ -33,7 +33,7 @@
                                         <th>Nama Siswa</th>
 
                                         <th>is_active</th>
-                                        <th>kode_unik</th>
+
                                         <th>Aksi</th>
 
                                     </tr>
@@ -46,7 +46,6 @@
                                             <td><?php echo $user->email; ?></td>
                                             <td><?php echo $user->nama_siswa; ?></td>
                                             <td><?php echo $user->is_active; ?></td>
-                                            <td><?php echo $user->kode_unik; ?></td>
                                             <td>
                                                 <div class="d-flex">
                                                     <a href="" data-toggle="modal" data-target="#ubah<?= $user->id; ?>" class="btn btn-primary shadow btn-xs sharp mr-1"><i class="fa fa-pencil"></i></a>

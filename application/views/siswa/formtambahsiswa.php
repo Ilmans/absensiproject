@@ -47,6 +47,17 @@
                                 </div>
                             </div>
                             <div class="form-group col-md-12">
+                                <label class="control-label">Jurusan :</label>
+                                <div class="controls">
+                                    <select name="jurusan" id="jurusan" class="form-control" required>
+                                        <option value="0" selected disabled>Pilih Jurusan..</option>
+                                        <?php foreach ($jurusan as $j) : ?>
+                                            <option value="<?= $j['id_jurusan']; ?>"><?= $j['jurusan']; ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-12">
                                 <label for="normal" class="control-label">Nomor Telepon :</label>
                                 <div class="controls">
                                     <input type="text" id="mask-phoneExt" name="nomor_hp" class="form-control" required>

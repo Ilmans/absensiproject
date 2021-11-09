@@ -15,7 +15,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 defined('SHOW_DEBUG_BACKTRACE') or define('SHOW_DEBUG_BACKTRACE', TRUE);
 
 define('WEBNAME', 'Absensi siswa');
-$webname = 'thisisimyglobalvariable';
+$webname = '';
 /*
 
 

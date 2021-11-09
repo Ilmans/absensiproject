@@ -40,13 +40,9 @@ class Ajax extends CI_Controller
             $jam_selesai_masuk = $this->db->query("SELECT * FROM tabel_jam_absen WHERE type = 'Masuk' ")->result_array()[0]['selesai'];
             $jam_keluar = $this->db->query("SELECT * FROM tabel_jam_absen WHERE type = 'Keluar' ")->result_array()[0]['mulai'];
             $jam_selesai_keluar = $this->db->query("SELECT * FROM tabel_jam_absen WHERE type = 'Keluar' ")->result_array()[0]['selesai'];
-            $jam_telat_masuk = $this->db->query("SELECT * FROM tabel_jam_absen WHERE type = 'Terlambat' ")->result_array()[0]['mulai'];
 
             if (strtotime($sekarang) >= strtotime($jam_masuk) && strtotime($sekarang) < strtotime($jam_selesai_masuk) && strtotime($sekarang)) {
                 $absen = 'h';
-                $type = 'masuk';
-            } else if (strtotime($sekarang) > strtotime($jam_telat_masuk) && strtotime($sekarang) < strtotime($jam_keluar)) {
-                $absen = 't';
                 $type = 'masuk';
             } else if (strtotime($sekarang) >= strtotime($jam_keluar) && strtotime($sekarang) > strtotime($jam_selesai_masuk)) {
                 $absen = 'h';
@@ -55,29 +51,29 @@ class Ajax extends CI_Controller
             $tglskrg = date('Y-m-d');
             $cekabsen = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND masuk = '1' AND tanggal_absen = '$tglskrg' ")->num_rows();
             if ($type == 'masuk') {
+                $datasiswa = $this->M_siswa->detailsiswa($nis);
+                $datasiswa2 = $datasiswa[0];
                 if ($cekabsen > 0) {
-                    $result2 = ['status' => 'false', 'alert' => 'success', 'message' => 'Kamu sudah absen masuk hari ini, selamat beraktivitas :)'];
-                    echo json_encode($result2);
+                    $result2 = ['status' => 'already', 'message' => 'Kamu sudah absen masuk hari ini, selamat beraktivitas :)'];
+                    echo json_encode(array_merge($result2, $datasiswa2));
                 } else {
-                    $datasiswa = $this->M_siswa->detailsiswa($nis);
-                    $datasiswa2 = $datasiswa[0];
                     $this->M_absensi->inputAbsenBySiswa($datasiswa2, $absen, $type);
                     $pesannya = 'Ananda ' . $datasiswa2['nama_siswa'] . ' telah absen masuk hari ini pada pukul ' . date('H:i:s');
                     $this->M_notif->send_whatsapp($datasiswa2['no_telepon'], $pesannya);
                     echo json_encode(array_merge($datasiswa2, ['status' => 'true']));
                 }
             } else if ($type == 'keluar') {
+                $datasiswa = $this->M_siswa->detailsiswa($nis);
+                $datasiswa2 = $datasiswa[0];
                 $cekabsenkeluar =     $cekabsen = $this->db->query("SELECT * FROM tabel_detail_absen WHERE nis = '$nis' AND keluar = '1' AND tanggal_absen = '$tglskrg' ")->num_rows();
                 if ($cekabsen == 0) {
-                    $result3 = ['status' => 'false', 'alert' => 'danger', 'message' => 'Kamu tidak bisa absen keluar , karna tidak ada data absen masuk kamu hari ini!'];
-                    echo json_encode($result3);
+                    $result3 = ['status' => 'already', 'alert' => 'danger', 'message' => 'Kamu tidak bisa absen keluar , karna tidak ada data absen masuk kamu hari ini!'];
+                    echo json_encode(array_merge($result3, $datasiswa2));
                 } else if ($cekabsenkeluar > 0) {
                     $result3 = ['status' => 'false', 'alert' => 'success', 'message' => 'Kamu sudah absen keluar hari ini, selamat beristirahat!'];
                     echo json_encode($result3);
                 } else {
                     $this->db->query("UPDATE tabel_detail_absen SET keluar = '1' WHERE nis ='$nis' AND tanggal_absen = '$tanggal' AND masuk = '1'");
-                    $datasiswa = $this->M_siswa->detailsiswa($nis);
-                    $datasiswa2 = $datasiswa[0];
 
                     $pesannya = 'Ananda ' . $datasiswa2['nama_siswa'] . ' telah absen keluar hari ini pada pukul ' . date('H:i:s');
                     $this->M_notif->send_whatsapp($datasiswa2['no_telepon'], $pesannya);

@@ -69,6 +69,7 @@ class Siswa extends CI_Controller
             'title' => WEBNAME . 'Menu access',
             'webname' => WEBNAME,
             'kelas' => $this->M_kelas->tampilkelas(),
+            'jurusan' => $this->M_jurusan->tampiljurusan(),
             'user' =>  $this->M_user->getUserById($this->session->userdata('id'))[0]
         ];
         $this->load->view('templates/header', $data);
@@ -109,6 +110,7 @@ class Siswa extends CI_Controller
                 'webname' => WEBNAME,
                 'siswa' => $datasiswa,
                 'kelas' => $this->M_kelas->tampilkelas(),
+                'jurusan' => $this->M_jurusan->tampiljurusan(),
                 'user' =>  $this->M_user->getUserById($this->session->userdata('id'))[0]
             ];
             $this->load->view('templates/header', $data);

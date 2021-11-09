@@ -37,6 +37,7 @@
                                         <th>Jenis Kelamin</th>
                                         <th>Alamat</th>
                                         <th>Kelas</th>
+                                        <th>Jurusan</th>
                                         <th>Tanggal Lahir</th>
                                         <th>Nomor HP</th>
                                         <!-- <th>QR</th> -->
@@ -53,6 +54,7 @@
                                             <td><?= $s['jenis_kelamin']; ?></td>
                                             <td><?= $s['alamat']; ?></td>
                                             <td><?= $s['kelas']; ?></td>
+                                            <td><?= $s['jurusan']; ?></td>
                                             <td><?= $s['tgl_lahir']; ?></td>
                                             <td><?= $s['no_telepon']; ?></td>
 
